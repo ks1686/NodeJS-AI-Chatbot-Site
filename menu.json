@@ -1,24 +1,34 @@
 {
   "data": [
     {
+      "id": 10382374238,
       "item": "Burger",
-      "amount": 30,
-      "price": 8.99
+      "price": 8.99,
+      "in_stock": true
     },
     {
+      "id": 32823940234,
       "item": "French Fries",
-      "amount": 25,
-      "price": "2.99"
+      "price": "2.99",
+      "in_stock": true
     },
     {
+      "id": 23492374235,
       "item": "Soda",
-      "amount": 15,
-      "price": 1.5
+      "price": 1.5,
+      "in_stock": true
     },
     {
+      "id": 23475823948,
       "item": "Ice Cream",
-      "amount": 10,
-      "price": 3.99
+      "price": 3.99,
+      "in_stock": true
+    },
+    {
+      "id": 48238429235,
+      "item": "Pizza",
+      "price": 12.99,
+      "in_stock": false
     }
   ]
 }
