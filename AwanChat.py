@@ -19,9 +19,7 @@ food_menu = db.getDb("menu.json")
 items = food_menu.getAll()
 
 # Add all items to the chat in a readable format
-menu_text = "\n".join(
-    [f"{item['item']}: ${item['price']} (Amount: {item['amount']})" for item in items]
-)
+menu_text = "\n".join([f"{item['item']}: ${item['price']})" for item in items])
 chat.add_message(Role.SYSTEM, f"Here is the food menu:\n{menu_text}")
 
 # Loop to take user input and generate responses
