@@ -1,0 +1,24 @@
+{
+  "data": [
+    {
+      "item": "Burger",
+      "amount": 30,
+      "price": 8.99
+    },
+    {
+      "item": "French Fries",
+      "amount": 25,
+      "price": "2.99"
+    },
+    {
+      "item": "Soda",
+      "amount": 15,
+      "price": 1.5
+    },
+    {
+      "item": "Ice Cream",
+      "amount": 10,
+      "price": 3.99
+    }
+  ]
+}
