@@ -4,19 +4,23 @@ from awan_llm_api.completions import Completions, ChatCompletions
 from pysondb import db
 import os
 import subprocess
-from gtts import gTTS
+import pvorca
 from pydub import AudioSegment
 from pydub.playback import play
 
 # API key and model name
 AWANLLM_API_KEY = "29d1a42a-37ad-49f2-bdc5-6309fdd89b4a"
 MODEL_NAME = "Meta-Llama-3-8B-Instruct"
+ORCA_ACCESS_KEY = "3Jbal8cmmrqZUcuOTmFcocMybuh9VfZKnNST7jZZSjYKt31zw1Wzkg=="
 
 # Initialize the client
 client = AwanLLMClient(AWANLLM_API_KEY)
 
 # Initialize chat completions instance
 chat = ChatCompletions(MODEL_NAME)
+
+# Initialize the Orca client
+orca = pvorca.create(access_key=ORCA_ACCESS_KEY)
 
 # Initialize the food menu
 food_menu = db.getDb("menu.json")
@@ -30,14 +34,23 @@ menu_text = "\n".join(
 )
 
 
-def speak(sound):
+def speak(text):
+    # Remove any invalid characters (e.g., *)
+    text = text.replace("*", "").replace("$", "USD: ")
+
+    # Synthesize speech using Orca and save to output.wav
+    alignments = orca.synthesize_to_file(text, "output.wav")
+
+    # Play the audio file using ffplay
     with open(os.devnull, "w") as devnull:
         subprocess.run(
-            ["ffplay", "-nodisp", "-autoexit", "temp.mp3"],
+            ["ffplay", "-nodisp", "-autoexit", "output.wav"],
             stdout=devnull,
             stderr=subprocess.STDOUT,
         )
-    os.remove("temp.mp3")
+
+    # Remove the temporary audio file
+    os.remove("output.wav")
 
 
 chat.add_message(Role.SYSTEM, f"Here is the food menu:\n{menu_text}")
@@ -56,12 +69,8 @@ while True:
     # Extract the content portion from the response
     content = chat_response["choices"][0]["message"]["content"]
 
-    tts = gTTS(text=content, lang="en")
-    tts.save("temp.mp3")
-    sound = AudioSegment.from_mp3("temp.mp3")
-
-    # print the response
-    print("AI: ", content)
+    # print to console
+    print(f"pAI: {content}")
 
     # Speak the response
-    speak(sound)
+    speak(content)

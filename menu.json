@@ -7,12 +7,12 @@
     },
     {
       "item": "French Fries",
-      "price": "2.99",
+      "price": 2.99,
       "in_stock": true
     },
     {
       "item": "Soda",
-      "price": 1.5,
+      "price": 1.50,
       "in_stock": true
     },
     {
