@@ -1,4 +1,4 @@
 /qodana.sarif.json
 /qodana.yaml
-/.idea
-/.myenv
+/.idea/
+/myenv/
