@@ -1,7 +1,7 @@
 {
   "data": [
     {
-      "item": "Burger",
+      "item": "Burgers",
       "price": 8.99,
       "in_stock": true
     },
@@ -12,7 +12,7 @@
     },
     {
       "item": "Soda",
-      "price": 1.50,
+      "price": 1.5,
       "in_stock": true
     },
     {

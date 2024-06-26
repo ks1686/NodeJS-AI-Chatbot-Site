@@ -32,7 +32,7 @@ items = food_menu.getAll()
 
 # Add all items to the chat in a readable format
 menu_text = "\n".join(
-    [f"{item['item']}: ${item['price']})" for item in items if item["in_stock"]]
+    [f"{item['item']}: ${item['price']}" for item in items if item["in_stock"]]
 )
 
 
@@ -47,14 +47,8 @@ def payment():
 # key phrase to confirm the order and end the conversation
 key_phrase = "Confirm my order"
 
-# Add a system message to the chat
-chat.add_message(
-    Role.SYSTEM,
-    "Here is the food menu, use it whenever someone asks"
-    "what's on the menu or if they want to place an order:\n{menu_text}."
-    "Users should format orders as follows: Burgers: 2, French Fries: 3. The number represents the "
-    "quantity the person is ordering. When you're ready to confirm the order, say 'Confirm my order'.",
-)
+# Add a system message to the chat with the menu
+chat.add_message(Role.SYSTEM, f"Here is the menu:\n{menu_text}")
 
 # Initialize the content variable
 content = ""
@@ -82,7 +76,7 @@ while True:
         break
 
     # Add a user message to the chat
-    chat.add_message(Role.USER, user_input)
+    chat.add_message(Role.USER, user_input + "Here is the menu:\n{menu_text}")
 
     # Request a completion from the model
     chat_response = client.chat_completion(chat)
