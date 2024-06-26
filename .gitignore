@@ -2,3 +2,4 @@
 /qodana.yaml
 /.idea/
 /myenv/
+.env
