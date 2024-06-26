@@ -1,22 +1,20 @@
 import os
-
+import json
+from dotenv import load_dotenv
 from awan_llm_api import AwanLLMClient, Role
 from awan_llm_api.completions import ChatCompletions
-from pysondb import db
-from dotenv import load_dotenv
-
 from speech import speech_to_text, text_to_speech
 
-# Load the environment variables
+# Load environment variables
 load_dotenv()
 
 # API key and model name
 AWANLLM_API_KEY = os.getenv("AWANLLM_API_KEY")
 MODEL_NAME = os.getenv("MODEL_NAME")
 
-# check if the API key and model name are provided
+# Check if the API key and model name are provided
 if not AWANLLM_API_KEY or not MODEL_NAME:
-    raise ValueError("Please provide the API key, model name")
+    raise ValueError("Please provide the API key and model name")
 
 # Initialize the client
 client = AwanLLMClient(AWANLLM_API_KEY)
@@ -24,16 +22,16 @@ client = AwanLLMClient(AWANLLM_API_KEY)
 # Initialize chat completions instance
 chat = ChatCompletions(MODEL_NAME)
 
-# Initialize the food menu
-food_menu = db.getDb("menu.json")
+# Load menu data from JSON
+with open("menu.json", "r") as f:
+    menu_data = json.load(f)["data"]
 
-# Get all items from the food menu
-items = food_menu.getAll()
-
-# Add all items to the chat in a readable format
+# Generate menu text
 menu_text = "\n".join(
-    [f"{item['item']}: ${item['price']}" for item in items if item["in_stock"]]
+    [f"{item['item']}: ${item['price']}" for item in menu_data if item["in_stock"]]
 )
+
+print(menu_text)
 
 
 def payment():
@@ -49,9 +47,6 @@ key_phrase = "Confirm my order"
 
 # Add a system message to the chat with the menu
 chat.add_message(Role.SYSTEM, f"Here is the menu:\n{menu_text}")
-
-# Initialize the content variable
-content = ""
 
 # Loop to take user input and generate responses
 while True:
@@ -76,7 +71,7 @@ while True:
         break
 
     # Add a user message to the chat
-    chat.add_message(Role.USER, user_input + "Here is the menu:\n{menu_text}")
+    chat.add_message(Role.USER, user_input)
 
     # Request a completion from the model
     chat_response = client.chat_completion(chat)
@@ -84,7 +79,7 @@ while True:
     # Extract the content portion from the response
     content = chat_response["choices"][0]["message"]["content"]
 
-    # print to console
+    # Print to console
     print(f"pAI: {content}")
 
     # Speak the response

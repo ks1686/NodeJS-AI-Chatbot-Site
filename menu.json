@@ -3,27 +3,37 @@
     {
       "item": "Burgers",
       "price": 8.99,
-      "in_stock": true
+      "in_stock": true,
+      "category": "Entree",
+      "description": "A delicious burger with all the fixings"
     },
     {
       "item": "French Fries",
       "price": 2.99,
-      "in_stock": true
+      "in_stock": true,
+      "category": "Side",
+      "description": "A side of crispy fries"
     },
     {
       "item": "Soda",
       "price": 1.5,
-      "in_stock": true
+      "in_stock": true,
+      "category": "Drink",
+      "description": "A refreshing soda"
     },
     {
       "item": "Ice Cream",
       "price": 3.99,
-      "in_stock": true
+      "in_stock": true,
+      "category": "Dessert",
+      "description": "A scoop of ice cream"
     },
     {
       "item": "Pizza",
       "price": 12.99,
-      "in_stock": false
+      "in_stock": false,
+      "category": "Entree",
+      "description": "A delicious pizza with all the fixings"
     }
   ]
 }

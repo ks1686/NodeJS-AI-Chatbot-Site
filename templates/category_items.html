@@ -1,0 +1,23 @@
+<!-- category_items.html -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ category_name }} Items</title>
+  </head>
+  <body>
+    <h1>{{ category_name }} Items</h1>
+    <div id="items-container">
+      <ul>
+        {% for item in items %}
+        <li>
+          <h3>{{ item.item }}</h3>
+          <p><strong>Description:</strong> {{ item.description }}</p>
+          <p><strong>Price:</strong> ${{ item.price }}</p>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </body>
+</html>
