@@ -19,7 +19,9 @@ def index():
 @app.route("/category/<category_name>")
 def category_items(category_name):
     items_in_category = [
-        item for item in menu_data["data"] if item["category"] == category_name
+        item
+        for item in menu_data["data"]
+        if item["category"] == category_name and item["in_stock"]
     ]
     return render_template(
         "category_items.html", category_name=category_name, items=items_in_category
