@@ -29,7 +29,7 @@ def record_audio(output_file="output.wav", duration=10):
 
 
 # Function to convert the recorded audio to text
-def voice_to_text():
+def speech_to_text():
     record_audio()
     r = sr.Recognizer()
 
@@ -50,7 +50,8 @@ def voice_to_text():
         os.remove(audio_file)
 
 
-def speak(text):
+# Function to convert text to speech and play the audio
+def text_to_speech(text):
     # Synthesize speech using gTTS and save to output.mp3
     tts = gTTS(text=text, lang="en")
     tts.save("output.mp3")

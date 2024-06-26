@@ -5,7 +5,7 @@ from awan_llm_api.completions import ChatCompletions
 from pysondb import db
 from dotenv import load_dotenv
 
-from voice_recognition import voice_to_text, speak
+from speech import speech_to_text, text_to_speech
 
 # Load the environment variables
 load_dotenv()
@@ -49,10 +49,12 @@ key_phrase = "Confirm my order"
 
 # Add a system message to the chat
 chat.add_message(
-    Role.SYSTEM, "Here is the food menu, use it whenever someone asks"
-                 "what's on the menu or if they want to place an order:\n{menu_text}."
-                 "Users should format orders as follows: Burgers: 2, French Fries: 3. The number represents the "
-                 "quantity the person is ordering. When you're ready to confirm the order, say 'Confirm my order'.", )
+    Role.SYSTEM,
+    "Here is the food menu, use it whenever someone asks"
+    "what's on the menu or if they want to place an order:\n{menu_text}."
+    "Users should format orders as follows: Burgers: 2, French Fries: 3. The number represents the "
+    "quantity the person is ordering. When you're ready to confirm the order, say 'Confirm my order'.",
+)
 
 # Initialize the content variable
 content = ""
@@ -68,7 +70,7 @@ while True:
 
     # if user input is "voice message", convert the voice to text
     if user_input.lower() == "voice message":
-        user_input = voice_to_text()
+        user_input = speech_to_text()
         if user_input:
             print(f"User (voice): {user_input}")
         else:
@@ -92,4 +94,4 @@ while True:
     print(f"pAI: {content}")
 
     # Speak the response
-    speak(content)
+    text_to_speech(content)
