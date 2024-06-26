@@ -1,13 +1,12 @@
 import os
-import subprocess
 
-import pvorca
 from awan_llm_api import AwanLLMClient, Role
 from awan_llm_api.completions import ChatCompletions
 from pysondb import db
 from dotenv import load_dotenv
 
 from voice_recognition import voice_to_text
+from speech import speak
 
 # Load the environment variables
 load_dotenv()
@@ -15,11 +14,10 @@ load_dotenv()
 # API key and model name
 AWANLLM_API_KEY = os.getenv("AWANLLM_API_KEY")
 MODEL_NAME = os.getenv("MODEL_NAME")
-ORCA_ACCESS_KEY = os.getenv("ORCA_ACCESS_KEY")
 
 # check if the API key and model name are provided
-if not AWANLLM_API_KEY or not MODEL_NAME or not ORCA_ACCESS_KEY:
-    raise ValueError("Please provide the API key, model name, and Orca access key")
+if not AWANLLM_API_KEY or not MODEL_NAME:
+    raise ValueError("Please provide the API key, model name")
 
 # Initialize the client
 client = AwanLLMClient(AWANLLM_API_KEY)
@@ -27,8 +25,6 @@ client = AwanLLMClient(AWANLLM_API_KEY)
 # Initialize chat completions instance
 chat = ChatCompletions(MODEL_NAME)
 
-# Initialize the Orca client
-orca = pvorca.create(access_key=ORCA_ACCESS_KEY)
 
 # Initialize the food menu
 food_menu = db.getDb("menu.json")
@@ -40,31 +36,6 @@ items = food_menu.getAll()
 menu_text = "\n".join(
     [f"{item['item']}: ${item['price']})" for item in items if item["in_stock"]]
 )
-
-
-def speak(text):
-    # Remove any invalid characters (e.g., *)
-    text = (
-        text.replace("*", "")
-        .replace("$", "USD: ")
-        .replace("=", "equals")
-        .replace(" x ", " times ")
-        .replace(" + ", " plus ")
-    )
-
-    # Synthesize speech using Orca and save to output.wav
-    orca.synthesize_to_file(text, "output.wav")
-
-    # Play the audio file using ffplay
-    with open(os.devnull, "w") as devnull:
-        subprocess.run(
-            ["ffplay", "-nodisp", "-autoexit", "output.wav"],
-            stdout=devnull,
-            stderr=subprocess.STDOUT,
-        )
-
-    # Remove the temporary audio file
-    os.remove("output.wav")
 
 
 def payment():

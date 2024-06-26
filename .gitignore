@@ -2,5 +2,6 @@
 /qodana.yaml
 /.idea/
 /myenv/
+/__pycache__/
 .env
 output.wav
