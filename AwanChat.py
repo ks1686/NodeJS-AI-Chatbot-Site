@@ -102,7 +102,7 @@ while True:
     if user_input.lower() == "voice message":
         user_input = voice_to_text()
         if user_input:
-            continue
+            print(f"User (voice): {user_input}")
         else:
             break
 

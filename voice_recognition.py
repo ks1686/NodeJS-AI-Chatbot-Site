@@ -47,7 +47,3 @@ def voice_to_text():
     finally:
         # Clean up: delete the temporary audio file
         os.remove(audio_file)
-
-
-# Run the function
-voice_to_text()
