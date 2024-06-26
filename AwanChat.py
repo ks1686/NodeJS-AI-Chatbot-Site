@@ -5,11 +5,21 @@ import pvorca
 from awan_llm_api import AwanLLMClient, Role
 from awan_llm_api.completions import ChatCompletions
 from pysondb import db
+from dotenv import load_dotenv
+
+from voice_recognition import voice_to_text
+
+# Load the environment variables
+load_dotenv()
 
 # API key and model name
-AWANLLM_API_KEY = "29d1a42a-37ad-49f2-bdc5-6309fdd89b4a"
-MODEL_NAME = "Meta-Llama-3-8B-Instruct"
-ORCA_ACCESS_KEY = "3Jbal8cmmrqZUcuOTmFcocMybuh9VfZKnNST7jZZSjYKt31zw1Wzkg=="
+AWANLLM_API_KEY = os.getenv("AWANLLM_API_KEY")
+MODEL_NAME = os.getenv("MODEL_NAME")
+ORCA_ACCESS_KEY = os.getenv("ORCA_ACCESS_KEY")
+
+# check if the API key and model name are provided
+if not AWANLLM_API_KEY or not MODEL_NAME or not ORCA_ACCESS_KEY:
+    raise ValueError("Please provide the API key, model name, and Orca access key")
 
 # Initialize the client
 client = AwanLLMClient(AWANLLM_API_KEY)
@@ -87,6 +97,14 @@ while True:
     # if the user input is empty or exit, break the loop
     if not user_input or user_input.lower() == "exit":
         break
+
+    # if user input is "voice message", convert the voice to text
+    if user_input.lower() == "voice message":
+        user_input = voice_to_text()
+        if user_input:
+            continue
+        else:
+            break
 
     # if the user input is the key phrase, end the conversation
     if key_phrase in user_input:
