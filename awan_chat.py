@@ -5,8 +5,7 @@ from awan_llm_api.completions import ChatCompletions
 from pysondb import db
 from dotenv import load_dotenv
 
-from voice_recognition import voice_to_text
-from speech import speak
+from voice_recognition import voice_to_text, speak
 
 # Load the environment variables
 load_dotenv()
@@ -24,7 +23,6 @@ client = AwanLLMClient(AWANLLM_API_KEY)
 
 # Initialize chat completions instance
 chat = ChatCompletions(MODEL_NAME)
-
 
 # Initialize the food menu
 food_menu = db.getDb("menu.json")
@@ -51,9 +49,10 @@ key_phrase = "Confirm my order"
 
 # Add a system message to the chat
 chat.add_message(
-    Role.SYSTEM,
-    f"Here is the food menu, use it whenever someone asks what's on the menu or if they want to place an order:\n{menu_text}. Users should format orders as follows:\nBurgers: 2, French Fries: 3. The number represents the quantity the person is ordering.\n{key_phrase} to confirm the order.",
-)
+    Role.SYSTEM, "Here is the food menu, use it whenever someone asks"
+                 "what's on the menu or if they want to place an order:\n{menu_text}."
+                 "Users should format orders as follows: Burgers: 2, French Fries: 3. The number represents the "
+                 "quantity the person is ordering. When you're ready to confirm the order, say 'Confirm my order'.", )
 
 # Initialize the content variable
 content = ""
