@@ -50,11 +50,9 @@ def payment():
 key_phrase = "Confirm my order"
 
 # Add a system message to the chat
-chat.add_message(Role.SYSTEM, f"Here is the food menu:\n{menu_text}")
-
-# add a system message to the chat for whenever key_phrase is mentioned, itemize the order
 chat.add_message(
-    Role.SYSTEM, "Please mention the item and the amount you would like to order"
+    Role.SYSTEM,
+    f"Here is the food menu, use it whenever someone asks what's on the menu or if they want to place an order:\n{menu_text}. Users should format orders as follows:\nBurgers: 2, French Fries: 3. The number represents the quantity the person is ordering.\n{key_phrase} to confirm the order.",
 )
 
 # Initialize the content variable
