@@ -4,10 +4,15 @@
 
 {% block content %}
 <h1>Menu Categories</h1>
-<ul>
-    <li><a href="/category/Entree" class="category-button">Entree</a></li>
-    <li><a href="/category/Side" class="category-button">Side</a></li>
-    <li><a href="/category/Drink" class="category-button">Drink</a></li>
-    <li><a href="/category/Dessert" class="category-button">Dessert</a></li>
-</ul>
+<div class="center-content">
+    <div class="category-grid">
+        <a href="/category/Entree" class="category-button">Entree</a>
+        <a href="/category/Side" class="category-button">Side</a>
+        <a href="/category/Drink" class="category-button">Drink</a>
+        <a href="/category/Dessert" class="category-button">Dessert</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
 {% endblock %}

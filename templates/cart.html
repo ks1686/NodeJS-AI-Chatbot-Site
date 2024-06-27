@@ -3,6 +3,57 @@
 {% block title %}Shopping Cart{% endblock %}
 
 {% block content %}
+<style>
+    /* Embedded CSS styles */
+    #cart-container {
+        font-size: 1.4em; /* Increase the base font size */
+    }
+
+    #cart-container ul {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    #cart-container li {
+        margin-bottom: 30px; /* Increase space between items */
+    }
+
+    #cart-container h3 {
+        font-size: 2em; /* Increase heading font size */
+        margin-bottom: 10px; /* Space below heading */
+    }
+
+    #cart-container p {
+        font-size: 1.3em; /* Increase paragraph font size */
+        margin-bottom: 15px; /* Space below paragraphs */
+    }
+
+    #cart-container form {
+        margin-top: 15px; /* Space above form */
+        display: inline; /* Display form elements inline */
+    }
+
+    #cart-container input[type="number"],
+    #cart-container button {
+        font-size: 1.2em; /* Adjust form element font size */
+        padding: 8px 12px; /* Adjust padding for form elements */
+    }
+
+    .category-button {
+        font-size: 1.3em; /* Increase button font size */
+        display: inline-block; /* Make the button inline */
+        padding: 12px 20px; /* Adjust padding for better button size */
+        text-decoration: none;
+        background-color: #f0f0f0;
+        border: 1px solid #ccc;
+        color: #333;
+    }
+
+    .category-button:hover {
+        background-color: #ddd;
+    }
+</style>
+
 <h1>Shopping Cart</h1>
 <div id="cart-container">
     <ul>
@@ -13,8 +64,7 @@
             <p><strong>Price:</strong> ${{ item.price }}</p>
             <p><strong>Quantity:</strong> {{ item.quantity }}</p>
             <p><strong>Subtotal:</strong> ${{ item.price | float * item.quantity }}</p>
-            <form action="{{ url_for('update_cart') }}" method="post" onsubmit="return handleFormSubmit(event)"
-                  style="display:inline;">
+            <form action="{{ url_for('update_cart') }}" method="post" onsubmit="return handleFormSubmit(event)">
                 <input type="hidden" name="item_name" value="{{ item.name }}">
                 <input type="number" name="quantity" value={{ item.quantity }} min="0" max="99">
                 <button type="submit">Update Quantity</button>

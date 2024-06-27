@@ -35,6 +35,7 @@ def add_to_cart():
     item_price = request.form.get("item_price")
     quantity = int(request.form.get("quantity"))
 
+    # If the cart is not in the session, create it
     if "cart" not in session:
         session["cart"] = []
 
@@ -88,7 +89,6 @@ def update_cart():
 def view_cart():
     cart = session.get("cart", [])
     total = sum(float(item["price"]) * item["quantity"] for item in cart)
-    quantity = sum(item["quantity"] for item in cart)
     return render_template("cart.html", cart=cart, total=total, hide_cart_button=True)
 
 

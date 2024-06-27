@@ -8,8 +8,8 @@
         .category-button, .cart-button {
             display: inline-block;
             margin: 5px;
-            padding: 10px 20px;
-            font-size: 16px;
+            padding: 90px 100px;
+            font-size: 40px;
             cursor: pointer;
             text-align: center;
             text-decoration: none;
@@ -26,6 +26,18 @@
             top: 10px;
             right: 10px;
         }
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            grid-gap: 20px;
+        }
+        .center-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* Vertical centering */
+            height: 100vh; /* Full viewport height */
+        }
+        
     </style>
 </head>
 <body>
