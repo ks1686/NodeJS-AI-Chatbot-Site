@@ -1,23 +1,27 @@
-<!-- category_items.html -->
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{{ category_name }} Items</title>
-  </head>
-  <body>
-    <h1>{{ category_name }} Items</h1>
-    <div id="items-container">
-      <ul>
+{% extends "base.html" %}
+
+{% block title %}{{ category_name }} Items{% endblock %}
+
+{% block content %}
+<h1>{{ category_name }} Items</h1>
+<div id="items-container">
+    <ul>
         {% for item in items %}
         <li>
-          <h3>{{ item.item }}</h3>
-          <p><strong>Description:</strong> {{ item.description }}</p>
-          <p><strong>Price:</strong> ${{ item.price }}</p>
+            <h3>{{ item.item }}</h3>
+            <p><strong>Description:</strong> {{ item.description }}</p>
+            <p><strong>Price:</strong> ${{ item.price }}</p>
+            <form action="{{ url_for('add_to_cart') }}" method="post">
+                <input type="hidden" name="item_name" value="{{ item.item }}">
+                <input type="hidden" name="item_price" value="{{ item.price }}">
+                <label for="quantity">Quantity:</label>
+                <input type="number" id="quantity" name="quantity" value="1" min="1">
+                <button type="submit">Add to Cart</button>
+            </form>
         </li>
         {% endfor %}
-      </ul>
-    </div>
-  </body>
-</html>
+        <li><a href="/" class="category-button">Back to Categories</a></li>
+
+    </ul>
+</div>
+{% endblock %}

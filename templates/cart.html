@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Shopping Cart{% endblock %}
+
+{% block content %}
+<h1>Shopping Cart</h1>
+<div id="cart-container">
+    <ul>
+        {% for item in cart %}
+        {% if item.quantity > 0 %} {# Only show items with quantity greater than 0 #}
+        <li>
+            <h3>{{ item.name }}</h3>
+            <p><strong>Price:</strong> ${{ item.price }}</p>
+            <p><strong>Quantity:</strong> {{ item.quantity }}</p>
+            <p><strong>Subtotal:</strong> ${{ item.price | float * item.quantity }}</p>
+            <form action="{{ url_for('update_cart') }}" method="post" onsubmit="return handleFormSubmit(event)"
+                  style="display:inline;">
+                <input type="hidden" name="item_name" value="{{ item.name }}">
+                <input type="number" name="quantity" value={{ item.quantity }} min="0" max="99">
+                <button type="submit">Update Quantity</button>
+                {% if item.quantity > 0 %}
+                <button type="submit" formaction="{{ url_for('remove_from_cart', item_name=item.name) }}">Remove
+                </button>
+                {% endif %}
+            </form>
+        </li>
+        {% endif %}
+        {% endfor %}
+        <li>
+            <h3>Total</h3>
+            <p><strong>Price:</strong> ${{ total }}</p>
+        </li>
+    </ul>
+</div>
+<a href="/" class="category-button">Back to Categories</a>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function handleFormSubmit(event) {
+        event.preventDefault(); // Prevent default form submission
+
+        // Get the form element
+        const form = event.target;
+
+        // Get the quantity input value
+        const quantityInput = form.querySelector('input[name="quantity"]');
+        const quantity = parseInt(quantityInput.value);
+
+        // If quantity is zero, submit to remove_from_cart route instead
+        if (quantity === 0) {
+            const item_name = form.querySelector('input[name="item_name"]').value;
+            const url = `{{ url_for('remove_from_cart', item_name='') }}${item_name}`;
+            form.action = url;
+        }
+
+        // Submit the form
+        form.submit();
+    }
+</script>
+{% endblock %}

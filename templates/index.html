@@ -1,18 +1,13 @@
-<!-- index.html -->
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Menu Categories</title>
-  </head>
-  <body>
-    <h1>Menu Categories</h1>
-    <ul>
-      <li><a href="/category/Entree">Entree</a></li>
-      <li><a href="/category/Side">Side</a></li>
-      <li><a href="/category/Drink">Drink</a></li>
-      <li><a href="/category/Dessert">Dessert</a></li>
-    </ul>
-  </body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}Menu Categories{% endblock %}
+
+{% block content %}
+<h1>Menu Categories</h1>
+<ul>
+    <li><a href="/category/Entree" class="category-button">Entree</a></li>
+    <li><a href="/category/Side" class="category-button">Side</a></li>
+    <li><a href="/category/Drink" class="category-button">Drink</a></li>
+    <li><a href="/category/Dessert" class="category-button">Dessert</a></li>
+</ul>
+{% endblock %}
