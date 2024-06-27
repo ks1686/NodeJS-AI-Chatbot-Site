@@ -6,16 +6,8 @@ function isNumber(event) {
   return /^\d$/.test(char);
 }
 
-// Function to limit number of characters in the input
-function limitInputLength(field, event, maxLength) {
-  if (field.value.length >= maxLength) {
-    event.preventDefault();
-    return false;
-  }
-}
-
 // Function to handle the keydown event
-function standardKeyHandler(field, event, key) {
+function standardKeyHandler(field, event) {
   const allowedKeys = [
     "Backspace",
     "Delete",
@@ -28,12 +20,17 @@ function standardKeyHandler(field, event, key) {
     "End",
   ];
 
+  // get the key, supporting older browsers
+  const key = event.key || String.fromCharCode(event.keyCode);
+
   if (key === "Enter" || key === "Escape") {
     field.blur();
     return true;
   }
 
-  return allowedKeys.includes(key) || event.ctrlKey || event.metaKey;
+  return (
+    allowedKeys.includes(key) || event.ctrlKey || event.metaKey || event.altKey
+  );
 }
 
 function handleNumericPaste(event) {
@@ -46,7 +43,6 @@ function handleNumericPaste(event) {
       return false; // Prevent the paste
     }
   }
-
   return true; // Allow the paste if clipboardData is unavailable or if it's numeric
 }
 

@@ -66,7 +66,7 @@
           type="number"
           id="quantity"
           name="quantity"
-          onkeypress="return isNumber(event) && limitInputLength(this, event, 2);"
+          onkeydown="return standardKeyHandler(this, event) || isNumber(event) && !(this.value.length >= 2);"
           onpaste="return handleNumericPaste(event)"
           onfocus="return clearTextBox(this)"
           onblur="return refillTextBox(this)"
