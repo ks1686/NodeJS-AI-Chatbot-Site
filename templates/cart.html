@@ -1,111 +1,126 @@
-{% extends "base.html" %}
-
-{% block title %}Shopping Cart{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% block title %}Shopping Cart{% endblock %} {% block
+content %}
 <style>
-    /* Embedded CSS styles */
-    #cart-container {
-        font-size: 1.4em; /* Increase the base font size */
-    }
+  /* Embedded CSS styles */
+  #cart-container {
+    font-size: 1.4em; /* Increase the base font size */
+  }
 
-    #cart-container ul {
-        list-style-type: none;
-        padding: 0;
-    }
+  #cart-container ul {
+    list-style-type: none;
+    padding: 0;
+  }
 
-    #cart-container li {
-        margin-bottom: 30px; /* Increase space between items */
-    }
+  #cart-container li {
+    margin-bottom: 30px; /* Increase space between items */
+  }
 
-    #cart-container h3 {
-        font-size: 2em; /* Increase heading font size */
-        margin-bottom: 10px; /* Space below heading */
-    }
+  #cart-container h3 {
+    font-size: 2em; /* Increase heading font size */
+    margin-bottom: 10px; /* Space below heading */
+  }
 
-    #cart-container p {
-        font-size: 1.3em; /* Increase paragraph font size */
-        margin-bottom: 15px; /* Space below paragraphs */
-    }
+  #cart-container p {
+    font-size: 1.3em; /* Increase paragraph font size */
+    margin-bottom: 15px; /* Space below paragraphs */
+  }
 
-    #cart-container form {
-        margin-top: 15px; /* Space above form */
-        display: inline; /* Display form elements inline */
-    }
+  #cart-container form {
+    margin-top: 15px; /* Space above form */
+    display: inline; /* Display form elements inline */
+  }
 
-    #cart-container input[type="number"],
-    #cart-container button {
-        font-size: 1.2em; /* Adjust form element font size */
-        padding: 8px 12px; /* Adjust padding for form elements */
-    }
+  #cart-container input[type="number"],
+  #cart-container button {
+    font-size: 1.2em; /* Adjust form element font size */
+    padding: 8px 12px; /* Adjust padding for form elements */
+  }
 
-    .category-button {
-        font-size: 1.3em; /* Increase button font size */
-        display: inline-block; /* Make the button inline */
-        padding: 12px 20px; /* Adjust padding for better button size */
-        text-decoration: none;
-        background-color: #f0f0f0;
-        border: 1px solid #ccc;
-        color: #333;
-    }
+  .category-button {
+    font-size: 1.3em; /* Increase button font size */
+    display: inline-block; /* Make the button inline */
+    padding: 12px 20px; /* Adjust padding for better button size */
+    text-decoration: none;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    color: #333;
+  }
 
-    .category-button:hover {
-        background-color: #ddd;
-    }
+  .category-button:hover {
+    background-color: #ddd;
+  }
 </style>
 
 <h1>Shopping Cart</h1>
 <div id="cart-container">
-    <ul>
-        {% for item in cart %}
-        {% if item.quantity > 0 %} {# Only show items with quantity greater than 0 #}
-        <li>
-            <h3>{{ item.name }}</h3>
-            <p><strong>Price:</strong> ${{ item.price }}</p>
-            <p><strong>Quantity:</strong> {{ item.quantity }}</p>
-            <p><strong>Subtotal:</strong> ${{ item.price | float * item.quantity }}</p>
-            <form action="{{ url_for('update_cart') }}" method="post" onsubmit="return handleFormSubmit(event)">
-                <input type="hidden" name="item_name" value="{{ item.name }}">
-                <input type="number" name="quantity" value={{ item.quantity }} min="0" max="99">
-                <button type="submit">Update Quantity</button>
-                {% if item.quantity > 0 %}
-                <button type="submit" formaction="{{ url_for('remove_from_cart', item_name=item.name) }}">Remove
-                </button>
-                {% endif %}
-            </form>
-        </li>
+  <ul>
+    {% for item in cart %} {% if item.quantity > 0 %} {# Only show items with
+    quantity greater than 0 #}
+    <li>
+      <h3>{{ item.name }}</h3>
+      <p><strong>Price:</strong> ${{ item.price }}</p>
+      <p><strong>Quantity:</strong> {{ item.quantity }}</p>
+      <p>
+        <strong>Subtotal:</strong> ${{ (item.price | float * item.quantity) |
+        round(2) | format_currency}}
+      </p>
+      <form
+        action="{{ url_for('update_cart') }}"
+        method="post"
+        onsubmit="return handleFormSubmit(event)"
+      >
+        <input type="hidden" name="item_name" value="{{ item.name }}" />
+        <input
+          type="number"
+          name="quantity"
+          onkeypress="return isNumber(event) && limitInputLength(this, event, 2);"
+          onpaste="return handleNumericPaste(event)"
+          onfocus="return clearTextBox(this)"
+          onblur="return refillTextBox(this)"
+          value="{{ item.quantity }}"
+          min="0"
+          max="99"
+        />
+        <button type="submit">Update Quantity</button>
+        {% if item.quantity > 0 %}
+        <button
+          type="submit"
+          formaction="{{ url_for('remove_from_cart', item_name=item.name) }}"
+        >
+          Remove
+        </button>
         {% endif %}
-        {% endfor %}
-        <li>
-            <h3>Total</h3>
-            <p><strong>Price:</strong> ${{ total }}</p>
-        </li>
-    </ul>
+      </form>
+    </li>
+    {% endif %} {% endfor %}
+    <li>
+      <h3>Total</h3>
+      <p><strong>Price:</strong> ${{ total | round(2) }}</p>
+    </li>
+  </ul>
 </div>
 <a href="/" class="category-button">Back to Categories</a>
-{% endblock %}
-
-{% block scripts %}
+{% endblock %} {% block scripts %}
 <script>
-    function handleFormSubmit(event) {
-        event.preventDefault(); // Prevent default form submission
+  function handleFormSubmit(event) {
+    event.preventDefault(); // Prevent default form submission
 
-        // Get the form element
-        const form = event.target;
+    // Get the form element
+    const form = event.target;
 
-        // Get the quantity input value
-        const quantityInput = form.querySelector('input[name="quantity"]');
-        const quantity = parseInt(quantityInput.value);
+    // Get the quantity input value
+    const quantityInput = form.querySelector('input[name="quantity"]');
+    const quantity = parseInt(quantityInput.value);
 
-        // If quantity is zero, submit to remove_from_cart route instead
-        if (quantity === 0) {
-            const item_name = form.querySelector('input[name="item_name"]').value;
-            const url = `{{ url_for('remove_from_cart', item_name='') }}${item_name}`;
-            form.action = url;
-        }
-
-        // Submit the form
-        form.submit();
+    // If quantity is zero, submit to remove_from_cart route instead
+    if (quantity === 0) {
+      const item_name = form.querySelector('input[name="item_name"]').value;
+      const url = `{{ url_for('remove_from_cart', item_name='') }}${item_name}`;
+      form.action = url;
     }
+
+    // Submit the form
+    form.submit();
+  }
 </script>
 {% endblock %}

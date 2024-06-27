@@ -3,10 +3,18 @@ from flask import Flask, render_template, request, redirect, url_for, session
 
 app = Flask(__name__)
 app.secret_key = "your_secret_key"  # Needed to use sessions; replace "your_secret_key" with a unique, secret value
+app.static_folder = "static"
+
 
 # Load menu data from JSON
 with open("menu.json", "r") as f:
     menu_data = json.load(f)
+
+
+# Template filter to format price when displayed as currency
+@app.template_filter("format_currency")
+def format_currency(value):
+    return f"{value:.2f}"
 
 
 # Route for the main page with category buttons
@@ -33,7 +41,12 @@ def category_items(category_name):
 def add_to_cart():
     item_name = request.form.get("item_name")
     item_price = request.form.get("item_price")
-    quantity = int(request.form.get("quantity"))
+    quantity_str = request.form.get("quantity")
+
+    if quantity_str and quantity_str.isdigit():
+        quantity = int(quantity_str)
+    else:
+        return "Invalid quantity", 400
 
     # If the cart is not in the session, create it
     if "cart" not in session:
@@ -49,7 +62,9 @@ def add_to_cart():
 
     # If the item is not in the cart, add it
     if not item_found:
-        session["cart"].append({"name": item_name, "price": item_price, "quantity": quantity})
+        session["cart"].append(
+            {"name": item_name, "price": item_price, "quantity": quantity}
+        )
 
     session.modified = True
     return redirect(url_for("view_cart"))
@@ -61,7 +76,9 @@ def remove_from_cart():
     item_name = request.form.get("item_name")
 
     if "cart" in session:
-        session["cart"] = [item for item in session["cart"] if item["name"] != item_name]
+        session["cart"] = [
+            item for item in session["cart"] if item["name"] != item_name
+        ]
         session.modified = True
 
     return redirect(url_for("view_cart"))
@@ -71,7 +88,12 @@ def remove_from_cart():
 @app.route("/update_cart", methods=["POST"])
 def update_cart():
     item_name = request.form.get("item_name")
-    new_quantity = int(request.form.get("quantity"))
+    new_quantity = request.form.get("quantity")
+
+    if new_quantity and new_quantity.isdigit():
+        new_quantity = int(new_quantity)
+    else:
+        return "Invalid quantity", 400
 
     if "cart" in session:
         for item in session["cart"]:

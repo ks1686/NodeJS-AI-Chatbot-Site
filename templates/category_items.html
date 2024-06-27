@@ -1,76 +1,84 @@
-{% extends "base.html" %}
-
-{% block title %}{{ category_name }} Items{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% block title %}{{ category_name }} Items{% endblock
+%} {% block content %}
 <style>
-    /* Embedded CSS styles */
-    #items-container {
-        font-size: 1.4em; /* Increase the base font size */
-    }
+  /* Embedded CSS styles */
+  #items-container {
+    font-size: 1.4em; /* Increase the base font size */
+  }
 
-    #items-container ul {
-        list-style-type: none;
-        padding: 0;
-    }
+  #items-container ul {
+    list-style-type: none;
+    padding: 0;
+  }
 
-    #items-container li {
-        margin-bottom: 30px; /* Increase space between items */
-    }
+  #items-container li {
+    margin-bottom: 30px; /* Increase space between items */
+  }
 
-    #items-container h3 {
-        font-size: 2em; /* Increase heading font size */
-        margin-bottom: 10px; /* Space below heading */
-    }
+  #items-container h3 {
+    font-size: 2em; /* Increase heading font size */
+    margin-bottom: 10px; /* Space below heading */
+  }
 
-    #items-container p {
-        font-size: 1.3em; /* Increase paragraph font size */
-        margin-bottom: 15px; /* Space below paragraphs */
-    }
+  #items-container p {
+    font-size: 1.3em; /* Increase paragraph font size */
+    margin-bottom: 15px; /* Space below paragraphs */
+  }
 
-    #items-container form {
-        margin-top: 15px; /* Space above form */
-    }
+  #items-container form {
+    margin-top: 15px; /* Space above form */
+  }
 
-    #items-container input[type="number"],
-    #items-container button {
-        font-size: 1.2em; /* Adjust form element font size */
-        padding: 8px 12px; /* Adjust padding for form elements */
-    }
+  #items-container input[type="number"],
+  #items-container button {
+    font-size: 1.2em; /* Adjust form element font size */
+    padding: 8px 12px; /* Adjust padding for form elements */
+  }
 
-    .category-button {
-        font-size: 1.3em; /* Increase button font size */
-        display: inline-block; /* Make the button inline */
-        padding: 12px 20px; /* Adjust padding for better button size */
-        text-decoration: none;
-        background-color: #f0f0f0;
-        border: 1px solid #ccc;
-        color: #333;
-    }
+  .category-button {
+    font-size: 1.3em; /* Increase button font size */
+    display: inline-block; /* Make the button inline */
+    padding: 12px 20px; /* Adjust padding for better button size */
+    text-decoration: none;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    color: #333;
+  }
 
-    .category-button:hover {
-        background-color: #ddd;
-    }
+  .category-button:hover {
+    background-color: #ddd;
+  }
 </style>
 
 <h1>{{ category_name }} Items</h1>
 <div id="items-container">
-    <ul>
-        {% for item in items %}
-        <li>
-            <h3>{{ item.item }}</h3>
-            <p><strong>Description:</strong> {{ item.description }}</p>
-            <p><strong>Price:</strong> ${{ item.price }}</p>
-            <form action="{{ url_for('add_to_cart') }}" method="post">
-                <input type="hidden" name="item_name" value="{{ item.item }}">
-                <input type="hidden" name="item_price" value="{{ item.price }}">
-                <label for="quantity">Quantity:</label>
-                <input type="number" id="quantity" name="quantity" value="1" min="1">
-                <button type="submit">Add to Cart</button>
-            </form>
-        </li>
-        {% endfor %}
-        <li><a href="/" class="category-button">Back to Categories</a></li>
-    </ul>
+  <ul>
+    {% for item in items %}
+    <li>
+      <h3>{{ item.item }}</h3>
+      <p><strong>Description:</strong> {{ item.description }}</p>
+      <p><strong>Price:</strong> ${{ item.price }}</p>
+      <form action="{{ url_for('add_to_cart') }}" method="post">
+        <input type="hidden" name="item_name" value="{{ item.item }}" />
+        <input type="hidden" name="item_price" value="{{ item.price }}" />
+        <label for="quantity">Quantity:</label>
+        <input
+          type="number"
+          id="quantity"
+          name="quantity"
+          onkeypress="return isNumber(event) && limitInputLength(this, event, 2);"
+          onpaste="return handleNumericPaste(event)"
+          onfocus="return clearTextBox(this)"
+          onblur="return refillTextBox(this)"
+          value="1"
+          min="1"
+          max="99"
+        />
+        <button type="submit">Add to Cart</button>
+      </form>
+    </li>
+    {% endfor %}
+    <li><a href="/" class="category-button">Back to Categories</a></li>
+  </ul>
 </div>
 {% endblock %}
