@@ -81,7 +81,7 @@ async function sendMessage() {
     const data = await response.json();
     // Extract bot message from response, where format is { "chat_response": "message" }
     const botMessage = data.chat_response;
-    
+
     // Append bot response to chat box
     appendMessage("Bot", botMessage);
   } catch (error) {
@@ -97,4 +97,17 @@ function appendMessage(sender, message) {
   messageElement.innerHTML = `<strong>${sender}:</strong> ${message}`;
   chatBox.appendChild(messageElement);
   chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+function toggleChat() {
+  var chatContainer = document.getElementById("chat-container");
+  var toggleBtn = document.getElementById("toggle-chat-btn");
+
+  chatContainer.classList.toggle("collapsed");
+
+  if (chatContainer.classList.contains("collapsed")) {
+    toggleBtn.textContent = "+";
+  } else {
+    toggleBtn.textContent = "-";
+  }
 }
