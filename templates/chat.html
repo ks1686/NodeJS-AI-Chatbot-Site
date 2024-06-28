@@ -1,0 +1,82 @@
+{% block styles %}
+<style>
+  .chat-container {
+    position: fixed;
+    bottom: 20px; /* Adjust as needed */
+    right: 20px; /* Adjust as needed */
+    max-width: 300px; /* Adjust chat box width */
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .chat-box {
+    height: 200px; /* Adjust chat box height */
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #fff;
+  }
+
+  .chat-input-container {
+    display: flex;
+    align-items: center;
+  }
+
+  .chat-input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+  }
+
+  .chat-send-button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-left: 10px;
+  }
+
+  .chat-send-button:hover {
+    background-color: #0056b3;
+  }
+  .chat-voice-button {
+    padding: 10px 20px;
+    background-color: #28a745; /* Green color for voice button */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-left: 10px;
+  }
+
+  .chat-voice-button:hover {
+    background-color: #218838; /* Darker green color on hover */
+  }
+</style>
+{% endblock %} {% block content %}
+<body>
+
+  <div class="chat-container">
+    <h1>Chat with Us</h1>
+    <div id="chat-box" class="chat-box">
+      <!-- Chat messages will be appended here -->
+    </div>
+    <div class="chat-input-container">
+      <label for="chat-input"></label>
+      <input type="text" id="chat-input" class="chat-input" placeholder="Type your message here...">
+      <button onclick="return sendMessage()" class="chat-send-button">Send</button>
+      <button class="chat-voice-button">Voice</button>
+    </div>
+  </div>
+  {% endblock %}
+
+  <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+</body>

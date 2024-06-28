@@ -55,3 +55,46 @@ function refillTextBox(textBox) {
 function clearTextBox(textBox) {
   if (textBox.value.trim() === textBox.defaultValue) textBox.value = "";
 }
+
+async function sendMessage() {
+  const chatInput = document.getElementById("chat-input");
+  const message = chatInput.value;
+  if (message.trim() === "") return;
+
+  // Append user message to chat box
+  appendMessage("User", message);
+  chatInput.value = "";
+
+  try {
+    const response = await fetch("/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ message }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+
+    const data = await response.json();
+    // Extract bot message from response, where format is { "chat_response": "message" }
+    const botMessage = data.chat_response;
+    
+    // Append bot response to chat box
+    appendMessage("Bot", botMessage);
+  } catch (error) {
+    console.error("Error:", error);
+    appendMessage("Bot", "Sorry, there was an error processing your request.");
+  }
+}
+
+function appendMessage(sender, message) {
+  const chatBox = document.getElementById("chat-box");
+  const messageElement = document.createElement("div");
+  messageElement.className = "message";
+  messageElement.innerHTML = `<strong>${sender}:</strong> ${message}`;
+  chatBox.appendChild(messageElement);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}

@@ -69,18 +69,19 @@ content %}
         method="post"
         onsubmit="return handleFormSubmit(event)"
       >
-        <input type="hidden" name="item_name" value="{{ item.name }}" />
-        <input
-          type="number"
-          name="quantity"
-          onkeydown="return standardKeyHandler(this, event) || isNumber(event) && !(this.value.length >= 2);"
-          onpaste="return handleNumericPaste(event)"
-          onfocus="return clearTextBox(this)"
-          onblur="return refillTextBox(this)"
-          value="{{ item.quantity }}"
-          min="0"
-          max="99"
-        />
+        <input type="hidden" name="item_name" value="{{ item.name }}"/>
+        <label>
+          <input
+            type="number"
+            name="quantity"
+            onkeydown="return standardKeyHandler(this, event) || isNumber(event) && !(this.value.length >= 2);"
+            onpaste="return handleNumericPaste(event)"
+            onblur="return refillTextBox(this)"
+            value="{{ item.quantity }}"
+            min="0"
+            max="99"
+          />
+        </label>
         <button type="submit">Update Quantity</button>
         {% if item.quantity > 0 %}
         <button
@@ -114,9 +115,7 @@ content %}
 
     // If quantity is zero, submit to remove_from_cart route instead
     if (quantity === 0) {
-      const item_name = form.querySelector('input[name="item_name"]').value;
-      const url = `{{ url_for('remove_from_cart', item_name='') }}${item_name}`;
-      form.action = url;
+      form.action = `{{ url_for('remove_from_cart', item_name='') }}$ {item_name}`;
     }
 
     // Submit the form

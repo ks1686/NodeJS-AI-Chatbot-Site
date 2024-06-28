@@ -59,8 +59,8 @@
       <p><strong>Description:</strong> {{ item.description }}</p>
       <p><strong>Price:</strong> ${{ item.price }}</p>
       <form action="{{ url_for('add_to_cart') }}" method="post">
-        <input type="hidden" name="item_name" value="{{ item.item }}" />
-        <input type="hidden" name="item_price" value="{{ item.price }}" />
+        <input type="hidden" name="item_name" value="{{ item.item }}"/>
+        <input type="hidden" name="item_price" value="{{ item.price }}"/>
         <label for="quantity">Quantity:</label>
         <input
           type="number"
@@ -68,7 +68,6 @@
           name="quantity"
           onkeydown="return standardKeyHandler(this, event) || isNumber(event) && !(this.value.length >= 2);"
           onpaste="return handleNumericPaste(event)"
-          onfocus="return clearTextBox(this)"
           onblur="return refillTextBox(this)"
           value="1"
           min="1"

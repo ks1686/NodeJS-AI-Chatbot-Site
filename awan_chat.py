@@ -31,8 +31,6 @@ menu_text = "\n".join(
     [f"{item['item']}: ${item['price']}" for item in menu_data if item["in_stock"]]
 )
 
-print(menu_text)
-
 
 def payment():
     print("Payment API called")

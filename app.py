@@ -1,14 +1,40 @@
+import os
 import json
-from flask import Flask, render_template, request, redirect, url_for, session
+from secrets import token_urlsafe as generate_secret_key
+from flask import Flask, jsonify, render_template, request, redirect, url_for, session
+from dotenv import load_dotenv
+from awan_llm_api import AwanLLMClient, Role
+from awan_llm_api.completions import ChatCompletions
 
 app = Flask(__name__)
-app.secret_key = "your_secret_key"  # Needed to use sessions; replace "your_secret_key" with a unique, secret value
+app.secret_key = generate_secret_key()
 app.static_folder = "static"
 
+# Load environment variables
+load_dotenv()
+
+# API key and model name
+AWANLLM_API_KEY = os.getenv("AWANLLM_API_KEY")
+MODEL_NAME = os.getenv("MODEL_NAME")
+
+# Check if the API key and model name are provided
+if not AWANLLM_API_KEY or not MODEL_NAME:
+    raise ValueError("Please provide the API key and model name")
+
+# Initialize the client
+client = AwanLLMClient(AWANLLM_API_KEY)
+
+# Initialize chat completions instance
+chat = ChatCompletions(MODEL_NAME)
 
 # Load menu data from JSON
 with open("menu.json", "r") as f:
-    menu_data = json.load(f)
+    menu_data = json.load(f)["data"]
+
+# Generate menu text
+menu_text = "\n".join(
+    [f"{item['item']}: ${item['price']}" for item in menu_data if item["in_stock"]]
+)
 
 
 # Template filter to format price when displayed as currency
@@ -28,7 +54,7 @@ def index():
 def category_items(category_name):
     items_in_category = [
         item
-        for item in menu_data["data"]
+        for item in menu_data
         if item["category"] == category_name and item["in_stock"]
     ]
     return render_template(
@@ -112,6 +138,31 @@ def view_cart():
     cart = session.get("cart", [])
     total = sum(float(item["price"]) * item["quantity"] for item in cart)
     return render_template("cart.html", cart=cart, total=total, hide_cart_button=True)
+
+
+# Route to render the chat page
+@app.route("/chat")
+def chat_page():
+    return render_template("chat.html")
+
+
+# Route to handle chat requests
+@app.route("/chat", methods=["POST"])
+def chat_api():
+    if request.is_json:
+        data = request.get_json()
+
+        # Add user message to chat
+        user_message = data["message"]
+
+        chat.add_message(Role.USER, user_message)
+        chat_response = client.chat_completion(chat)
+
+        # Extract the content portion from the response
+        content = chat_response["choices"][0]["message"]["content"]
+        return jsonify({"chat_response": content})
+    else:  # Return error for non-JSON requests
+        return "Invalid request", 400
 
 
 if __name__ == "__main__":
