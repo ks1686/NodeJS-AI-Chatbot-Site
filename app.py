@@ -140,12 +140,6 @@ def view_cart():
     return render_template("cart.html", cart=cart, total=total, hide_cart_button=True)
 
 
-# Route to render the chat page
-@app.route("/chat")
-def chat_page():
-    return render_template("chat.html")
-
-
 # Route to handle chat requests
 @app.route("/chat", methods=["POST"])
 def chat_api():

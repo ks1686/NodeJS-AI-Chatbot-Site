@@ -111,3 +111,9 @@ function toggleChat() {
     toggleBtn.textContent = "-";
   }
 }
+
+function quickSubmitChat(event) {
+  if (event.key === "Enter") {
+    sendMessage();
+  }
+}
