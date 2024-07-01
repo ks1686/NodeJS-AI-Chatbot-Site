@@ -1,3 +1,41 @@
+let isRecording = false;
+let recordButton = document.querySelector(".recordBtn");
+
+recordButton.addEventListener("click", function () {
+  if (isRecording) {
+    // Stop recording
+    $.ajax({
+      url: "/record",
+      type: "POST",
+      data: { action: "stop" },
+      success: function (response) {
+        if (response.status === "Recording stopped") {
+          let text = response.text;
+          document.getElementById("chat-input").value = text;
+          sendMessage();
+        }
+        isRecording = false;
+        recordButton.textContent = "Voice";
+        recordButton.style.backgroundColor = "#28a745";
+      },
+    });
+  } else {
+    // Start recording
+    $.ajax({
+      url: "/record",
+      type: "POST",
+      data: { action: "start" },
+      success: function (response) {
+        if (response.status === "Recording started") {
+          isRecording = true;
+          recordButton.textContent = "Stop";
+          recordButton.style.backgroundColor = "#dc3545";
+        }
+      },
+    });
+  }
+});
+
 // Function to handle whether the input is a number
 function isNumber(event) {
   const charCode =

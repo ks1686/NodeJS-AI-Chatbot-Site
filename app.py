@@ -1,10 +1,14 @@
-import os
 import json
+import os
+import subprocess
 from secrets import token_urlsafe as generate_secret_key
-from flask import Flask, jsonify, render_template, request, redirect, url_for, session
-from dotenv import load_dotenv
+
+import speech_recognition as sr
 from awan_llm_api import AwanLLMClient, Role
 from awan_llm_api.completions import ChatCompletions
+from dotenv import load_dotenv
+from flask import Flask, jsonify, render_template, request, redirect, url_for, session
+from gtts import gTTS
 
 app = Flask(__name__)
 app.secret_key = generate_secret_key()
@@ -12,6 +16,9 @@ app.static_folder = "static"
 
 # Load environment variables
 load_dotenv()
+
+# Initialize recording process
+recording_process = None
 
 # API key and model name
 AWANLLM_API_KEY = os.getenv("AWANLLM_API_KEY")
@@ -157,6 +164,90 @@ def chat_api():
         return jsonify({"chat_response": content})
     else:  # Return error for non-JSON requests
         return "Invalid request", 400
+
+
+# Route to handle audio recording requests
+@app.route("/record", methods=["POST"])
+def record():
+    action = request.form.get("action")
+
+    print(f"Action: {action}")
+
+    if action == "start":
+        start_recording()
+        return jsonify({"status": "Recording started"})
+    elif action == "stop":
+        stop_recording()
+        text = speech_to_text()
+        return jsonify({"status": "Recording stopped", "text": text})
+    return jsonify({"status": "Invalid action"})
+
+
+# Function to start recording audio using ffmpeg
+def start_recording(output_file="output.wav"):
+    global recording_process
+    command = [
+        "ffmpeg",
+        "-f",
+        "avfoundation",
+        "-i",
+        ":0",
+        "-acodec",
+        "pcm_s16le",
+        "-ar",
+        "16000",
+        "-ac",
+        "2",
+        output_file,
+    ]
+    recording_process = subprocess.Popen(
+        command, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
+
+
+# Function to stop recording audio
+def stop_recording():
+    global recording_process
+    if recording_process:
+        recording_process.terminate()
+        recording_process = None
+
+
+# Function to convert the recorded audio to text
+def speech_to_text():
+    audio_file = "output.wav"
+    r = sr.Recognizer()
+
+    with sr.AudioFile(audio_file) as source:
+        audio_data = r.record(source)
+
+    try:
+        print("Converting audio to text...")
+        return r.recognize_sphinx(audio_data)
+    except sr.UnknownValueError:
+        return "Could not understand the audio"
+    except sr.RequestError as e:
+        return f"Error: {e}"
+    finally:
+        os.remove(audio_file)
+
+
+# Function to convert text to speech and play the audio
+def text_to_speech(text):
+    # Synthesize speech using gTTS and save to output.mp3
+    tts = gTTS(text=text, lang="en")
+    tts.save("output.mp3")
+
+    # Play the audio file using ffplay
+    with open(os.devnull, "w") as devnull:
+        subprocess.run(
+            ["ffplay", "-nodisp", "-autoexit", "output.mp3"],
+            stdout=devnull,
+            stderr=subprocess.STDOUT,
+        )
+
+    # Remove the temporary audio file
+    os.remove("output.mp3")
 
 
 if __name__ == "__main__":

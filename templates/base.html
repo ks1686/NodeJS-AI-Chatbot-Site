@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}{% endblock %}</title>
     <style>
       .category-button,
@@ -111,7 +111,7 @@
       }
 
       .chat-send-button,
-      .chat-voice-button {
+      .recordBtn {
         padding: 10px 20px;
         background-color: #007bff;
         color: white;
@@ -122,18 +122,19 @@
       }
 
       .chat-send-button:hover,
-      .chat-voice-button:hover {
+      .recordBtn:hover {
         background-color: #0056b3;
       }
 
-      .chat-voice-button {
+      .recordBtn {
         background-color: #28a745; /* Green color for voice button */
       }
 
-      .chat-voice-button:hover {
+      .recordBtn:hover {
         background-color: #218838; /* Darker green color on hover */
       }
     </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   </head>
   <body>
     {% if not hide_cart_button %}
@@ -162,13 +163,8 @@
             placeholder="Type your message here..."
             onkeydown="quickSubmitChat(event)"
           />
-          <button
-            onclick="sendMessage()"
-            class="chat-send-button"
-          >
-            Send
-          </button>
-          <button class="chat-voice-button">Voice</button>
+          <button onclick="sendMessage()" class="chat-send-button">Send</button>
+          <button class="recordBtn" id="recordBtn">Voice</button>
         </div>
       </div>
     </div>
