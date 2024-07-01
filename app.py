@@ -1,19 +1,14 @@
-from email.mime import audio
 import json
 import os
-from re import sub
-import subprocess
 from secrets import token_urlsafe as generate_secret_key
 
-import speech_recognition as sr
+import ffmpeg
 from awan_llm_api import AwanLLMClient, Role
 from awan_llm_api.completions import ChatCompletions
 from dotenv import load_dotenv
 from flask import Flask, jsonify, render_template, request, redirect, url_for, session
-from gtts import gTTS
-from web_speech import speech_to_text
-import ffmpeg
 
+from web_speech import speech_to_text
 
 app = Flask(__name__)
 app.secret_key = generate_secret_key()

@@ -34,10 +34,6 @@ menu_text = "\n".join(
 
 def payment():
     print("Payment API called")
-    # extract the database items and quantity from the chat. items are formatted as below:
-    # * 2 Burgers: $8.99 x 2 = $17.98
-    # * 1 French Fries: $2.99
-    # we want: 2 Burgers, 1 French Fries
 
 
 # key phrase to confirm the order and end the conversation
