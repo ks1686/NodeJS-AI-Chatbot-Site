@@ -24,8 +24,8 @@ function startRecording() {
           .then((response) => response.json())
           .then((data) => {
             console.log("Success:", data);
-            // Extract the message and append it to the chat box
-            appendMessage("User", data.text);
+            // Extract the message and fill the chatInput with the data
+            document.getElementById("chat-input").value = data.text;
           })
           .catch((error) => {
             console.error("Error:", error);
