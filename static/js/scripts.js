@@ -13,9 +13,6 @@ function startRecording() {
         const blob = new Blob(chunks, { type: mediaRecorder.mimeType });
         chunks = [];
 
-        // Append user message to chat box
-        appendMessage("User", "Audio message");
-
         // send the audio to the server
         const formData = new FormData();
         formData.append("audio", blob, "output.mp3");
@@ -27,6 +24,8 @@ function startRecording() {
           .then((response) => response.json())
           .then((data) => {
             console.log("Success:", data);
+            // Extract the message and append it to the chat box
+            appendMessage("User", data.text);
           })
           .catch((error) => {
             console.error("Error:", error);

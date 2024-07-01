@@ -183,8 +183,6 @@ def record_audio():
         audio_path = "output.mp3"  # Adjust path as needed
         audio_file.save(audio_path)
 
-        subprocess.run(["ffplay", "-nodisp", "-autoexit", audio_path])
-
         # Convert the mp3 to wav
         ffmpeg.input(audio_path).output("output.wav").run()
 
@@ -194,7 +192,6 @@ def record_audio():
         # Clear out the old mp3 audio file
         os.remove(audio_path)
 
-        print(f"Converted audio to text: {text}")
         return jsonify({"text": text}), 200
 
     except Exception as e:
