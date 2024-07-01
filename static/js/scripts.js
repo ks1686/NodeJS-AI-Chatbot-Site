@@ -1,39 +1,66 @@
-let isRecording = false;
-let recordButton = document.querySelector(".recordBtn");
+let mediaRecorder;
+let chunks = [];
 
-recordButton.addEventListener("click", function () {
-  if (isRecording) {
-    // Stop recording
-    $.ajax({
-      url: "/record",
-      type: "POST",
-      data: { action: "stop" },
-      success: function (response) {
-        if (response.status === "Recording stopped") {
-          let text = response.text;
-          document.getElementById("chat-input").value = text;
-          sendMessage();
-        }
-        isRecording = false;
-        recordButton.textContent = "Voice";
-        recordButton.style.backgroundColor = "#28a745";
-      },
+function startRecording() {
+  navigator.mediaDevices
+    .getUserMedia({ audio: true })
+    .then(function (stream) {
+      mediaRecorder = new MediaRecorder(stream);
+      mediaRecorder.ondataavailable = function (e) {
+        chunks.push(e.data);
+      };
+      mediaRecorder.onstop = function () {
+        const blob = new Blob(chunks, { type: mediaRecorder.mimeType });
+        chunks = [];
+
+        // Append user message to chat box
+        appendMessage("User", "Audio message");
+
+        // send the audio to the server
+        const formData = new FormData();
+        formData.append("audio", blob, "output.mp3");
+
+        fetch("/record", {
+          method: "POST",
+          body: formData,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log("Success:", data);
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
+      };
+
+      mediaRecorder.start();
+      document.getElementById("recordBtn").style.display = "none"; // Hide record button
+      document.getElementById("stopBtn").style.display = "inline-block"; // Show stop button
+    })
+    .catch(function (err) {
+      console.error("Error accessing microphone:", err);
     });
-  } else {
-    // Start recording
-    $.ajax({
-      url: "/record",
-      type: "POST",
-      data: { action: "start" },
-      success: function (response) {
-        if (response.status === "Recording started") {
-          isRecording = true;
-          recordButton.textContent = "Stop";
-          recordButton.style.backgroundColor = "#dc3545";
-        }
-      },
-    });
+}
+
+function stopRecording() {
+  if (mediaRecorder && mediaRecorder.state !== "inactive") {
+    mediaRecorder.stop();
+    document.getElementById("stopBtn").style.display = "none"; // Hide stop button
+    document.getElementById("recordBtn").style.display = "inline-block"; // Show record button
   }
+}
+
+function toggleRecording() {
+  if (mediaRecorder && mediaRecorder.state === "recording") {
+    stopRecording();
+  } else {
+    startRecording();
+  }
+}
+
+// Event listener for the record button
+document.getElementById("recordBtn").addEventListener("click", function () {
+  startRecording();
 });
 
 // Function to handle whether the input is a number

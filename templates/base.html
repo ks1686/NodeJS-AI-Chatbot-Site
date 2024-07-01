@@ -164,7 +164,17 @@
             onkeydown="quickSubmitChat(event)"
           />
           <button onclick="sendMessage()" class="chat-send-button">Send</button>
-          <button class="recordBtn" id="recordBtn">Voice</button>
+          <button class="recordBtn" id="recordBtn" onclick="toggleRecording()">
+            Record
+          </button>
+          <button
+            class="recordBtn"
+            id="stopBtn"
+            style="display: none"
+            onclick="stopRecording()"
+          >
+            Stop
+          </button>
         </div>
       </div>
     </div>

@@ -1,5 +1,7 @@
+from email.mime import audio
 import json
 import os
+from re import sub
 import subprocess
 from secrets import token_urlsafe as generate_secret_key
 
@@ -9,6 +11,9 @@ from awan_llm_api.completions import ChatCompletions
 from dotenv import load_dotenv
 from flask import Flask, jsonify, render_template, request, redirect, url_for, session
 from gtts import gTTS
+from web_speech import speech_to_text
+import ffmpeg
+
 
 app = Flask(__name__)
 app.secret_key = generate_secret_key()
@@ -166,88 +171,35 @@ def chat_api():
         return "Invalid request", 400
 
 
-# Route to handle audio recording requests
+# Route to handle recording audio
 @app.route("/record", methods=["POST"])
-def record():
-    action = request.form.get("action")
+def record_audio():
+    if "audio" not in request.files:
+        return jsonify({"error": "No audio file received"}), 400
 
-    print(f"Action: {action}")
-
-    if action == "start":
-        start_recording()
-        return jsonify({"status": "Recording started"})
-    elif action == "stop":
-        stop_recording()
-        text = speech_to_text()
-        return jsonify({"status": "Recording stopped", "text": text})
-    return jsonify({"status": "Invalid action"})
-
-
-# Function to start recording audio using ffmpeg
-def start_recording(output_file="output.wav"):
-    global recording_process
-    command = [
-        "ffmpeg",
-        "-f",
-        "avfoundation",
-        "-i",
-        ":0",
-        "-acodec",
-        "pcm_s16le",
-        "-ar",
-        "16000",
-        "-ac",
-        "2",
-        output_file,
-    ]
-    recording_process = subprocess.Popen(
-        command, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-    )
-
-
-# Function to stop recording audio
-def stop_recording():
-    global recording_process
-    if recording_process:
-        recording_process.terminate()
-        recording_process = None
-
-
-# Function to convert the recorded audio to text
-def speech_to_text():
-    audio_file = "output.wav"
-    r = sr.Recognizer()
-
-    with sr.AudioFile(audio_file) as source:
-        audio_data = r.record(source)
+    audio_file = request.files["audio"]
 
     try:
-        print("Converting audio to text...")
-        return r.recognize_sphinx(audio_data)
-    except sr.UnknownValueError:
-        return "Could not understand the audio"
-    except sr.RequestError as e:
-        return f"Error: {e}"
-    finally:
-        os.remove(audio_file)
+        audio_path = "output.mp3"  # Adjust path as needed
+        audio_file.save(audio_path)
 
+        subprocess.run(["ffplay", "-nodisp", "-autoexit", audio_path])
 
-# Function to convert text to speech and play the audio
-def text_to_speech(text):
-    # Synthesize speech using gTTS and save to output.mp3
-    tts = gTTS(text=text, lang="en")
-    tts.save("output.mp3")
+        # Convert the mp3 to wav
+        ffmpeg.input(audio_path).output("output.wav").run()
 
-    # Play the audio file using ffplay
-    with open(os.devnull, "w") as devnull:
-        subprocess.run(
-            ["ffplay", "-nodisp", "-autoexit", "output.mp3"],
-            stdout=devnull,
-            stderr=subprocess.STDOUT,
-        )
+        # Process the audio file (convert to text)
+        text = speech_to_text("output.wav")
 
-    # Remove the temporary audio file
-    os.remove("output.mp3")
+        # Clear out the old mp3 audio file
+        os.remove(audio_path)
+
+        print(f"Converted audio to text: {text}")
+        return jsonify({"text": text}), 200
+
+    except Exception as e:
+        print(f"Error processing audio: {e}")
+        return jsonify({"error": str(e)}), 500
 
 
 if __name__ == "__main__":
