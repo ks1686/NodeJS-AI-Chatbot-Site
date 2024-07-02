@@ -43,6 +43,9 @@ menu_text = "\n".join(
     [f"{item['item']}: ${item['price']}" for item in menu_data if item["in_stock"]]
 )
 
+# Add a system message to the chat with the menu
+chat.add_message(Role.SYSTEM, f"Here is the menu:\n{menu_text}")
+
 
 # Template filter to format price when displayed as currency
 @app.template_filter("format_currency")

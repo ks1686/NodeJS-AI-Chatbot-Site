@@ -1,6 +1,8 @@
+// Variables
 let mediaRecorder;
 let chunks = [];
 
+// Start recording user audio
 function startRecording() {
   navigator.mediaDevices
     .getUserMedia({ audio: true })
@@ -41,6 +43,7 @@ function startRecording() {
     });
 }
 
+// Stop recording user audio
 function stopRecording() {
   if (mediaRecorder && mediaRecorder.state !== "inactive") {
     mediaRecorder.stop();
@@ -49,6 +52,7 @@ function stopRecording() {
   }
 }
 
+// Toggle recording button functionality
 function toggleRecording() {
   if (mediaRecorder && mediaRecorder.state === "recording") {
     stopRecording();
@@ -97,6 +101,7 @@ function standardKeyHandler(field, event) {
   );
 }
 
+// Function to handle the paste event for numeric boxes
 function handleNumericPaste(event) {
   let clipboardData = event.clipboardData || window.clipboardData;
 
@@ -120,6 +125,7 @@ function clearTextBox(textBox) {
   if (textBox.value.trim() === textBox.defaultValue) textBox.value = "";
 }
 
+// Function to handle sending a message to the chatbot
 async function sendMessage() {
   const chatInput = document.getElementById("chat-input");
   const message = chatInput.value;
@@ -148,12 +154,16 @@ async function sendMessage() {
 
     // Append bot response to chat box
     appendMessage("Bot", botMessage);
+
+    // Speak the bot message
+    textToSpeech(botMessage);
   } catch (error) {
     console.error("Error:", error);
     appendMessage("Bot", "Sorry, there was an error processing your request.");
   }
 }
 
+// Append a message to the chat box
 function appendMessage(sender, message) {
   const chatBox = document.getElementById("chat-box");
   const messageElement = document.createElement("div");
@@ -163,6 +173,15 @@ function appendMessage(sender, message) {
   chatBox.scrollTop = chatBox.scrollHeight;
 }
 
+// Function to enable text to speech functionality
+function textToSpeech(chatbox_text) {
+  if (chatbox_text.trim() === "") return;
+
+  const utterance = new SpeechSynthesisUtterance(chatbox_text);
+  speechSynthesis.speak(utterance);
+}
+
+// Function to toggle the chat box
 function toggleChat() {
   var chatContainer = document.getElementById("chat-container");
   var toggleBtn = document.getElementById("toggle-chat-btn");
@@ -176,8 +195,11 @@ function toggleChat() {
   }
 }
 
+// Function to handle the keydown event for the chat input
 function quickSubmitChat(event) {
   if (event.key === "Enter") {
     sendMessage();
+    return false;
   }
+  return true;
 }
