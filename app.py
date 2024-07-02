@@ -184,7 +184,6 @@ def chat_api():
         return "Invalid request", 400
 
 
-# Route to handle recording audio
 @app.route("/record", methods=["POST"])
 def record_audio():
     if "audio" not in request.files:
@@ -193,26 +192,28 @@ def record_audio():
     audio_file = request.files["audio"]
 
     try:
-        audio_path = "output.mp3"  # Adjust path as needed
-        audio_file.save(audio_path)
+        audio_path_mp3 = os.path.join(app.config["UPLOAD_FOLDER"], "output.mp3")
+        audio_path_wav = os.path.join(app.config["UPLOAD_FOLDER"], "output.wav")
+
+        # Save the mp3 file
+        audio_file.save(audio_path_mp3)
 
         # Convert the mp3 to wav
-        ffmpeg.input(audio_path).output("output.wav").run()
+        ffmpeg.input(audio_path_mp3).output(audio_path_wav).run()
 
         # Process the audio file (convert to text)
-        text = speech_to_text("output.wav")
+        text = speech_to_text(audio_path_wav)
 
         # Clear out the old mp3 audio file
-        os.remove(audio_path)
+        if os.path.exists(audio_path_mp3):
+            os.remove(audio_path_mp3)
 
         return jsonify({"text": text}), 200
 
     except Exception as e:
-        print(f"Error processing audio: {e}")
         return jsonify({"error": str(e)}), 500
 
 
-# Route to handle streaming audio from backend to frontend
 @app.route("/tts", methods=["POST"])
 def stream_tts():
     data = request.get_json()
@@ -232,7 +233,6 @@ def serve_audio(filename):
     return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
 
 
-# Route to delete the audio file
 @app.route("/delete_audio", methods=["DELETE"])
 def delete_audio():
     try:
