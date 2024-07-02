@@ -163,7 +163,7 @@ async function sendMessage() {
   }
 }
 
-// Function to handle the TTS endpoint
+/// Function to handle the TTS endpoint
 async function text_to_speech(text) {
   try {
     const response = await fetch("/tts", {
@@ -184,6 +184,13 @@ async function text_to_speech(text) {
     // Create new audio element and play the audio
     const audioElement = new Audio(audioUrl);
     audioElement.controls = false;
+
+    audioElement.addEventListener("ended", async () => {
+      // Delete the audio file after it's played
+      await fetch("/delete_audio", {
+        method: "DELETE",
+      });
+    });
 
     audioElement.play().catch((error) => {
       console.error("Error playing audio:", error);

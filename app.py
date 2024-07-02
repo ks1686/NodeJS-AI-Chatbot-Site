@@ -1,3 +1,4 @@
+from email.mime import audio
 import json
 import os
 from secrets import token_urlsafe as generate_secret_key
@@ -229,6 +230,20 @@ def stream_tts():
 @app.route("/static/audio/<path:filename>")
 def serve_audio(filename):
     return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
+
+
+# Route to delete the audio file
+@app.route("/delete_audio", methods=["DELETE"])
+def delete_audio():
+    try:
+        audio_path = os.path.join(app.config["UPLOAD_FOLDER"], "output.mp3")
+        if os.path.exists(audio_path):
+            os.remove(audio_path)
+            return jsonify({"message": "Audio file deleted"}), 200
+        else:
+            return jsonify({"error": "Audio file not found"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 if __name__ == "__main__":
