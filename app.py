@@ -1,12 +1,10 @@
-from email.mime import audio
-import json
 import os
+import json
 from secrets import token_urlsafe as generate_secret_key
 
 import ffmpeg
 from awan_llm_api import AwanLLMClient, Role
 from awan_llm_api.completions import ChatCompletions
-from gtts import gTTS
 from dotenv import load_dotenv
 from flask import (
     Flask,
@@ -18,6 +16,7 @@ from flask import (
     session,
     send_from_directory,
 )
+from gtts import gTTS
 
 from web_speech import speech_to_text
 
