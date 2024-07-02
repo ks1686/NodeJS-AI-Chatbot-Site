@@ -5,14 +5,28 @@ from secrets import token_urlsafe as generate_secret_key
 import ffmpeg
 from awan_llm_api import AwanLLMClient, Role
 from awan_llm_api.completions import ChatCompletions
+from gtts import gTTS
 from dotenv import load_dotenv
-from flask import Flask, jsonify, render_template, request, redirect, url_for, session
+from flask import (
+    Flask,
+    jsonify,
+    render_template,
+    request,
+    redirect,
+    url_for,
+    session,
+    send_from_directory,
+)
 
 from web_speech import speech_to_text
 
 app = Flask(__name__)
 app.secret_key = generate_secret_key()
 app.static_folder = "static"
+app.config["UPLOAD_FOLDER"] = "static/audio"
+
+if not os.path.exists(app.config["UPLOAD_FOLDER"]):
+    os.makedirs(app.config["UPLOAD_FOLDER"])
 
 # Load environment variables
 load_dotenv()
@@ -195,6 +209,26 @@ def record_audio():
     except Exception as e:
         print(f"Error processing audio: {e}")
         return jsonify({"error": str(e)}), 500
+
+
+# Route to handle streaming audio from backend to frontend
+@app.route("/tts", methods=["POST"])
+def stream_tts():
+    data = request.get_json()
+    text = data["text"]
+
+    # Generate speech
+    tts = gTTS(text)
+    audio_path = os.path.join(app.config["UPLOAD_FOLDER"], "output.mp3")
+    tts.save(audio_path)
+
+    return jsonify({"audio_url": url_for("serve_audio", filename="output.mp3")}), 200
+
+
+# Serve static files
+@app.route("/static/audio/<path:filename>")
+def serve_audio(filename):
+    return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
 
 
 if __name__ == "__main__":

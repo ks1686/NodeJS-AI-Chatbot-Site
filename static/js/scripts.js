@@ -155,11 +155,41 @@ async function sendMessage() {
     // Append bot response to chat box
     appendMessage("Bot", botMessage);
 
-    // Speak the bot message
-    textToSpeech(botMessage);
+    // Handle sending the AI response to the TTS endpoint
+    text_to_speech(botMessage);
   } catch (error) {
     console.error("Error:", error);
     appendMessage("Bot", "Sorry, there was an error processing your request.");
+  }
+}
+
+// Function to handle the TTS endpoint
+async function text_to_speech(text) {
+  try {
+    const response = await fetch("/tts", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ text }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+
+    const data = await response.json();
+    const audioUrl = data.audio_url;
+
+    // Create new audio element and play the audio
+    const audioElement = new Audio(audioUrl);
+    audioElement.controls = false;
+
+    audioElement.play().catch((error) => {
+      console.error("Error playing audio:", error);
+    });
+  } catch (error) {
+    console.error("Error:", error);
   }
 }
 
@@ -171,14 +201,6 @@ function appendMessage(sender, message) {
   messageElement.innerHTML = `<strong>${sender}:</strong> ${message}`;
   chatBox.appendChild(messageElement);
   chatBox.scrollTop = chatBox.scrollHeight;
-}
-
-// Function to enable text to speech functionality
-function textToSpeech(chatbox_text) {
-  if (chatbox_text.trim() === "") return;
-
-  const utterance = new SpeechSynthesisUtterance(chatbox_text);
-  speechSynthesis.speak(utterance);
 }
 
 // Function to toggle the chat box
