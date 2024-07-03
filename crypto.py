@@ -40,9 +40,6 @@ def check_transaction():
     tx_value = tx.get("value") if tx else None
     tx_to = tx.get("to") if tx else None
 
-    print(tx_value)
-    print(data.get("amount"))
-
     if (
         tx
         and tx_to is not None
