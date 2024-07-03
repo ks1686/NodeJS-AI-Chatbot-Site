@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Check Ethereum Transaction</title>
+  </head>
+  <body>
+    <h1>Check Ethereum Transaction</h1>
+    <form id="check-transaction-form">
+      <label for="tx_hash">Transaction Hash:</label>
+      <input type="text" id="tx_hash" name="tx_hash" required /><br /><br />
+      <label for="amount">Amount (ETH):</label>
+      <input
+        type="number"
+        id="amount"
+        name="amount"
+        step="0.00000001"
+        required
+      /><br /><br />
+      <button type="submit">Check Transaction</button>
+    </form>
+    <div id="result"></div>
+
+    <script>
+      document
+        .getElementById("check-transaction-form")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
+
+          const txHash = document.getElementById("tx_hash").value;
+          const amount = document.getElementById("amount").value;
+
+          fetch("/check_transaction", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ tx_hash: txHash, amount: amount }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              const resultDiv = document.getElementById("result");
+              resultDiv.innerHTML = `<p>Status: ${data.status}</p><p>Message: ${data.message}</p>`;
+            })
+            .catch((error) => console.error("Error:", error));
+        });
+    </script>
+  </body>
+</html>
