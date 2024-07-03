@@ -1,5 +1,6 @@
 import json
 import os
+import qrcode
 
 import dotenv
 from flask import Flask, request, jsonify, render_template
@@ -23,7 +24,12 @@ if not wallet_address:
 
 @app.route("/")
 def index():
-    return render_template("check_transaction.html")
+    img = qrcode.make(f"ethereum:{wallet_address}")
+    type(img)
+    qr_img_path = "static/qrcode.png"
+    img.save(qr_img_path)
+
+    return render_template("crypto_index.html", qr_img_path=qr_img_path)
 
 
 @app.route("/check_transaction", methods=["POST"])

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Wallet QR Code</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        margin: 50px;
+      }
+      .qr-code {
+        max-width: 300px;
+        margin: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Wallet QR Code</h1>
+    <p>Scan the QR code below to send transactions to your wallet:</p>
+    <img
+      class="qr-code"
+      src="{{ url_for('static', filename='qrcode.png') }}"
+      alt="Wallet QR Code"
+    />
+  </body>
+</html>
