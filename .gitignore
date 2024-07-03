@@ -8,3 +8,4 @@ output.mp3
 output.wav
 private_key.pem
 public_key.pem
+depay_public_key.pem
