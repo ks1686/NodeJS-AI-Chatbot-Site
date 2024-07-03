@@ -26,25 +26,19 @@ dotenv.load_dotenv()
 # Initialize recording process
 recording_process = None
 
-# API key and model name
+# Chat API key and model name
 AWANLLM_API_KEY = os.getenv("AWANLLM_API_KEY")
 MODEL_NAME = os.getenv("MODEL_NAME")
-
-# Check if the API key and model name are provided
 if not AWANLLM_API_KEY or not MODEL_NAME:
     raise ValueError("Please provide the API key and model name")
 
 # Initialize the client
 client = awan_llm_api.AwanLLMClient(AWANLLM_API_KEY)
-
-# Initialize chat completions instance
 chat = awan_llm_api.completions.ChatCompletions(MODEL_NAME)
 
 # Load menu data from JSON
 with open("menu.json", "r") as f:
     menu_data = json.load(f)["data"]
-
-# Generate menu text
 menu_text = "\n".join(
     [f"{item['item']}: ${item['price']}" for item in menu_data if item["in_stock"]]
 )
