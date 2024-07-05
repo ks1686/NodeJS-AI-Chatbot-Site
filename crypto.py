@@ -15,7 +15,7 @@ app = flask.Flask(__name__)
 dotenv.load_dotenv()
 
 # Load the depay public key from the depay_key.pem file
-DEPAY_PUBLIC_KEY = open("depay_key.pem").read()
+DEPAY_PUBLIC_KEY = open("depay_public_key.pem").read()
 depay_key = serialization.load_pem_public_key(DEPAY_PUBLIC_KEY.encode("utf-8"))
 
 # Load  private key from the private_key.pem file
@@ -41,7 +41,11 @@ def index():
     qr_img_path = "static/qrcode.png"
     img.save(qr_img_path)
 
-    return flask.render_template("crypto_index.html", qr_img_path=qr_img_path)
+    return flask.render_template(
+        "crypto_index.html",
+        qr_img_path=qr_img_path,
+        wallet_address=wallet_address,
+    )
 
 
 @app.route("/check_transaction", methods=["POST"])

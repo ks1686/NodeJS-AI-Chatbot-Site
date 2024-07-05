@@ -79,5 +79,20 @@
             .catch((error) => console.error("Error:", error));
         });
     </script>
+
+    <div
+      class="DePayButton"
+      label="Pay"
+      integration="1f517a0d-5bf3-4095-a096-c6b11d8e4d91"
+      blockchains='["ethereum","bsc","polygon","solana","gnosis","fantom","avalanche","arbitrum","optimism","base"]'
+    ></div>
+    <script src="https://integrate.depay.com/buttons/v12.js"></script>
+    <noscript
+      ><a href="https://depay.com">Web3 Payments</a> are only supported with
+      JavaScript enabled.</noscript
+    >
+    <script>
+      DePayButtons.init({ document: document });
+    </script>
   </body>
 </html>
