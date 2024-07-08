@@ -74,22 +74,14 @@ def check_transaction():
         )
 
 
-@app.route("/webhook", methods=["POST"])
-def webhook():
-    data = flask.request.get_json()
-    if "event" in data and data["event"] == "mined_transaction":
-        tx_hash = data["hash"]
-        tx = w3.eth.get_transaction(tx_hash)
-        tx_value = tx.get("value") if tx else None
-
-        if tx and tx.get("to") == wallet_address and tx_value is not None:
-            amount_received = web3.Web3.from_wei(tx_value, "ether")
-            # Here you can add logic to verify the amount and update your application state
-            return flask.jsonify(
-                {"status": "success", "message": "Transaction received!"}
-            )
-    return flask.jsonify({"status": "failure", "message": "Invalid data."}), 400
+# Callback endpoint for the Depay payment gateway
+@app.route("/depay_callback", methods=["POST"])
+def depay_callback():
+    # Respond with 200 OK status code as the callback is received
+    response = flask.jsonify({"status": "success"})
+    response.status_code = 200
+    return response
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(port=8000, debug=True)
