@@ -1,10 +1,10 @@
 const express = require("express");
+const fs = require("fs");
+const path = require("path");
 const dotenv = require("dotenv");
 const Web3 = require("web3");
 const QRCode = require("qrcode");
 const bodyParser = require("body-parser");
-const fs = require("fs");
-const path = require("path");
 
 // Load environment variables
 dotenv.config();

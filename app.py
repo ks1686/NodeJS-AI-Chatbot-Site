@@ -23,9 +23,6 @@ if not os.path.exists(app.config["UPLOAD_FOLDER"]):
 # Load environment variables
 dotenv.load_dotenv()
 
-# Initialize recording process
-recording_process = None
-
 # Chat API key and model name
 AWANLLM_API_KEY = os.getenv("AWANLLM_API_KEY")
 MODEL_NAME = os.getenv("MODEL_NAME")
