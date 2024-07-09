@@ -1,6 +1,6 @@
 import json
 import os
-from secrets import token_urlsafe as generate_secret_key
+import secrets
 
 import awan_llm_api
 import awan_llm_api.completions
@@ -13,7 +13,7 @@ import gtts
 from backend_scripts import speech_to_text
 
 app = flask.Flask(__name__)
-app.secret_key = generate_secret_key()
+app.secret_key = secrets.token_urlsafe()
 app.static_folder = "static"
 app.config["UPLOAD_FOLDER"] = "static/audio"
 

@@ -6,6 +6,7 @@ import flask
 import web3
 import base64
 
+
 from cryptography.hazmat.primitives import serialization, hashes
 from cryptography.hazmat.primitives.asymmetric import padding
 
@@ -14,14 +15,11 @@ app = flask.Flask(__name__)
 # Load environment variables
 dotenv.load_dotenv()
 
-# Load the depay public key from the depay_key.pem file
-DEPAY_PUBLIC_KEY = open("depay_public_key.pem").read()
-depay_key = serialization.load_pem_public_key(DEPAY_PUBLIC_KEY.encode("utf-8"))
+# Set the public and private key environment variables from the .pem files
+public_key = ""
+with open("public_key.pem", "rb") as pem_file:
+    public_key = serialization.load_pem_public_key(pem_file.read())
 
-# Load  private key from the private_key.pem file
-PRIVATE_KEY = open("private_key.pem").read()
-private_key_bytes = PRIVATE_KEY.encode("utf-8")
-private_key = serialization.load_pem_private_key(private_key_bytes, password=None)
 
 # Initialize the Web3 provider
 w3 = web3.Web3(web3.Web3.HTTPProvider(os.getenv("SEPOLIA_ETH_ENDPOINT")))
@@ -77,7 +75,9 @@ def check_transaction():
 # Callback endpoint for the Depay payment gateway
 @app.route("/depay_callback", methods=["POST"])
 def depay_callback():
-    # Respond with 200 OK status code as the callback is received
+    data = flask.request.get_json()
+    print(f"Depay callback data: {data}")
+
     response = flask.jsonify({"status": "success"})
     response.status_code = 200
     return response
