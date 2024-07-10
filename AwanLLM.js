@@ -1,11 +1,11 @@
-import fetch from "node-fetch";
-import dotenv from "dotenv";
+const dotenv = require("dotenv");
 
 dotenv.config();
 
 const AWANLLM_API_KEY = process.env.AWANLLM_API_KEY;
 
 async function sendChatCompletions() {
+  const fetch = (await import("node-fetch")).default;
   const url = "https://api.awanllm.com/v1/chat/completions";
 
   const payload = {
