@@ -135,9 +135,6 @@ app.post("/add_to_cart", (req, res) => {
     }
   });
 
-  // Debug: Print the contents of the cart
-  console.log(req.session.cart);
-
   // Stay on the same page
   res.redirect("back");
 });
@@ -158,9 +155,6 @@ app.post("/remove_from_cart", (req, res) => {
       return res.status(500).send("Failed to save the cart");
     }
   });
-
-  // Debug: Print the contents of the cart
-  console.log(req.session.cart);
 
   // Stay on the same page
   res.redirect("back");
@@ -190,12 +184,31 @@ app.post("/update_cart", (req, res) => {
       return res.status(500).send("Failed to save the cart");
     }
 
-    // Debug: Print the contents of the cart
-    console.log(req.session.cart);
-
     // Stay on the same page
     res.redirect("back");
   });
+});
+
+// Route to handle chat requests
+app.post("/chat", async (req, res) => {
+  if (req.is("application/json")) {
+    const { message } = req.body;
+
+    // Add user message to the chat
+    chatbot.role("user").content(message);
+    const responses = await chatbot.sendChatCompletions();
+
+    if (responses) {
+      const joinedResponses = responses.join("");
+      res.json({ chat_response: joinedResponses });
+    } else {
+      res.json({
+        chat_response: "Sorry, there was an error processing your request.",
+      });
+    }
+  } else {
+    res.status(400).send("Invalid request type");
+  }
 });
 
 // Start the server

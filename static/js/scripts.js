@@ -201,7 +201,7 @@ async function text_to_speech(text) {
 
 // Append a message to the chat box
 function appendMessage(sender, message) {
-  const chatBox = document.getElementById("chat-box");
+  const chatBox = document.querySelector(".chat-box");
   const messageElement = document.createElement("div");
   messageElement.className = "message";
   messageElement.innerHTML = `<strong>${sender}:</strong> ${message}`;

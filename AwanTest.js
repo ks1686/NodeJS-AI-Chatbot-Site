@@ -12,9 +12,7 @@ async function run() {
     .role("system")
     .content("You are a helpful assistant.")
     .role("user")
-    .content("Hello!")
-    .role("assistant")
-    .content("Hi!, how can I help you today?");
+    .content("Hello!");
 
   const responses = await chatbot.sendChatCompletions();
   if (responses) {
