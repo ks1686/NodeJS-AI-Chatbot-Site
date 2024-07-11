@@ -81,6 +81,22 @@ app.get("/category/:category_name", (req, res) => {
   });
 });
 
+// Route to view the cart, transaction total, and hide_cart_button
+app.get("/view_cart", (req, res) => {
+  let total = 0;
+  if (req.session.cart) {
+    req.session.cart.forEach((item) => {
+      total += item.price * item.quantity;
+    });
+  }
+
+  res.render("view_cart.ejs", {
+    cart: req.session.cart,
+    total: total.toFixed(2),
+    hide_cart_button: true,
+  });
+});
+
 //Route to add item to the cart
 app.post("/add_to_cart", (req, res) => {
   const { item_name, item_price, quantity } = req.body;
@@ -124,6 +140,62 @@ app.post("/add_to_cart", (req, res) => {
 
   // Stay on the same page
   res.redirect("back");
+});
+
+// Route to remove items from the cart
+app.post("/remove_from_cart", (req, res) => {
+  const { item_name } = req.body;
+
+  if (!req.session.cart) {
+    return res.status(400).send("Cart is empty");
+  }
+
+  req.session.cart = req.session.cart.filter((item) => item.name !== item_name);
+
+  req.session.save((err) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send("Failed to save the cart");
+    }
+  });
+
+  // Debug: Print the contents of the cart
+  console.log(req.session.cart);
+
+  // Stay on the same page
+  res.redirect("back");
+});
+
+// Route to update item quantity inside the cart
+app.post("/update_cart", (req, res) => {
+  const { item_name, new_quantity } = req.body;
+
+  if (!req.session.cart) {
+    return res.status(400).send("Cart is empty");
+  }
+
+  if (!new_quantity || isNaN(new_quantity) || parseInt(new_quantity) < 1) {
+    return res.status(400).send("Invalid quantity");
+  }
+
+  req.session.cart.forEach((item) => {
+    if (item.name === item_name) {
+      item.quantity = parseInt(new_quantity);
+    }
+  });
+
+  req.session.save((err) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send("Failed to save the cart");
+    }
+
+    // Debug: Print the contents of the cart
+    console.log(req.session.cart);
+
+    // Stay on the same page
+    res.redirect("back");
+  });
 });
 
 // Start the server
