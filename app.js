@@ -1,9 +1,12 @@
 const express = require("express");
+const session = require("express-session");
+const bodyParser = require("body-parser");
 const fs = require("fs");
 const path = require("path");
 const dotenv = require("dotenv");
 const AwanLLM = require("./AwanLLM");
 const { Leopard } = require("@picovoice/leopard-node");
+const crypto = require("crypto");
 
 // Load environment variables
 dotenv.config();
@@ -13,6 +16,16 @@ const app = express();
 app.use(express.static(path.join(__dirname, "static")));
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "templates"));
+
+// Middleware
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(
+  session({
+    secret: crypto.randomBytes(64).toString("hex"),
+    resave: false,
+    saveUninitialized: true,
+  })
+);
 
 // Load the menu data from JSON
 let menuData = [];
@@ -66,6 +79,51 @@ app.get("/category/:category_name", (req, res) => {
     category_name: category_name,
     items: items_in_category,
   });
+});
+
+//Route to add item to the cart
+app.post("/add_to_cart", (req, res) => {
+  const { item_name, item_price, quantity } = req.body;
+
+  if (!quantity || isNaN(quantity) || parseInt(quantity) < 1) {
+    return res.status(400).send("Invalid quantity");
+  }
+
+  // Initialize the cart in the session if it doesn't exist
+  if (!req.session.cart) {
+    req.session.cart = [];
+  }
+
+  // Check if the item is already in the cart
+  let itemFound = false;
+  req.session.cart.forEach((item) => {
+    if (item.name === item_name) {
+      item.quantity += parseInt(quantity);
+      itemFound = true;
+    }
+  });
+
+  // If the item is not in the cart, add it
+  if (!itemFound) {
+    req.session.cart.push({
+      name: item_name,
+      price: parseFloat(item_price),
+      quantity: parseInt(quantity),
+    });
+  }
+
+  req.session.save((err) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send("Failed to save the cart");
+    }
+  });
+
+  // Debug: Print the contents of the cart
+  console.log(req.session.cart);
+
+  // Stay on the same page
+  res.redirect("back");
 });
 
 // Start the server
