@@ -1,0 +1,130 @@
+<div class="chat-container">
+  <style>
+    .chat-container {
+      position: fixed;
+      bottom: 20px; /* Adjust as needed */
+      right: 20px; /* Adjust as needed */
+      max-width: 300px; /* Adjust chat box width */
+      background-color: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .chat-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    #chat-title {
+      margin: 0;
+    }
+
+    .toggle-chat-btn {
+      position: absolute;
+      top: 20px; /* Adjust as needed */
+      right: 20px; /* Adjust as needed */
+      background-color: transparent;
+      border: none;
+      color: #000;
+      font-size: 20px;
+      cursor: pointer;
+      z-index: 1000; /* Ensure button remains on top */
+    }
+
+    .chat-container.collapsed #chat-title {
+      display: none; /* Hide title when chat is collapsed */
+    }
+
+    .chat-content {
+      transition: max-height 0.3s ease-out; /* Smooth transition for collapse effect */
+      max-height: 1000px; /* Initial max height, adjust as needed */
+      overflow: hidden;
+    }
+
+    .chat-container.collapsed .chat-content {
+      max-height: 0; /* Collapse chat content */
+      overflow: hidden;
+    }
+
+    .chat-box {
+      height: 200px; /* Adjust chat box height */
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 10px;
+      background-color: #fff;
+    }
+
+    .chat-input-container {
+      display: flex;
+      align-items: center;
+    }
+
+    .chat-input {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+
+    .chat-send-button,
+    .recordBtn {
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+
+    .chat-send-button:hover,
+    .recordBtn:hover {
+      background-color: #0056b3;
+    }
+
+    .recordBtn {
+      background-color: #28a745; /* Green color for voice button */
+    }
+
+    .recordBtn:hover {
+      background-color: #218838; /* Darker green color on hover */
+    }
+  </style>
+
+  <div class="chat-header">
+    <h1>Chat with Us</h1>
+  </div>
+  <button class="toggle-chat-btn" onclick="toggleChat()">-</button>
+  <div class="chat-content">
+    <div class="chat-box">
+      <!-- Chat messages will be appended here -->
+    </div>
+    <div class="chat-input-container">
+      <label for="chat-input"></label>
+      <input
+        type="text"
+        id="chat-input"
+        class="chat-input"
+        placeholder="Type your message here..."
+        onkeydown="quickSubmitChat(event)"
+      />
+      <button onclick="sendMessage()" class="chat-send-button">Send</button>
+      <button id="recordBtn" class="recordBtn" onclick="toggleRecording()">
+        Record
+      </button>
+      <button
+        id="stopBtn"
+        class="recordBtn"
+        style="display: none"
+        onclick="stopRecording()"
+      >
+        Stop
+      </button>
+    </div>
+  </div>
+</div>
