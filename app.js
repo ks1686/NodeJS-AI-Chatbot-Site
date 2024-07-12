@@ -5,7 +5,6 @@ const fs = require("fs");
 const path = require("path");
 const dotenv = require("dotenv");
 const AwanLLM = require("./AwanLLM");
-const { Leopard } = require("@picovoice/leopard-node");
 const crypto = require("crypto");
 
 // Load environment variables
@@ -56,9 +55,6 @@ if (!LLM_API_KEY || !LLM_MODEL) {
 }
 const chatbot = new AwanLLM(LLM_API_KEY, LLM_MODEL);
 chatbot.role("system").content("Here is our menu:\n" + menuText);
-
-// Initialize Leopard
-const leopard = new Leopard(process.env.PICOVOICE_ACCESS_KEY);
 
 // Route to load the main page
 app.get("/", (req, res) => {

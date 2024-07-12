@@ -23,8 +23,15 @@ if not os.path.exists(app.config["UPLOAD_FOLDER"]):
 # Load environment variables
 dotenv.load_dotenv()
 
+
+# Print all environment variables
+for key, value in os.environ.items():
+    print(f"{key}: {value}")
+
 # Chat API key and model name
 AWANLLM_API_KEY = os.getenv("AWANLLM_API_KEY")
+
+
 MODEL_NAME = os.getenv("MODEL_NAME")
 if not AWANLLM_API_KEY or not MODEL_NAME:
     raise ValueError("Please provide the API key and model name")
