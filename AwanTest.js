@@ -15,11 +15,8 @@ async function run() {
     .role("user")
     .content("Hello!");
 
-  const responses = await chatbot.sendChatCompletions();
-  if (responses) {
-    const joinedResponses = responses.join("");
-    console.log("Bot", joinedResponses);
-  }
+  const response = await chatbot.sendChatCompletions();
+  console.log(response);
 }
 
 run();

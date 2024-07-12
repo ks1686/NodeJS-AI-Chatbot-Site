@@ -1,12 +1,13 @@
 const express = require("express");
 const session = require("express-session");
-const bodyParser = require("body-parser");
-const fs = require("fs");
-const path = require("path");
-const dotenv = require("dotenv");
-const AwanLLM = require("./AwanLLM");
-const crypto = require("crypto");
 const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
+const dotenv = require("dotenv");
+const crypto = require("crypto");
+const bodyParser = require("body-parser");
+const AwanLLM = require("./AwanLLM");
+const gtts = require("gtts");
 
 // Load environment variables
 dotenv.config();
@@ -207,15 +208,14 @@ app.post("/update_cart", (req, res) => {
 // Route to handle chat requests
 app.post("/chat", async (req, res) => {
   if (req.is("application/json")) {
-    const { message } = req.body;
+    const message = req.body.message;
 
     // Add user message to the chat
     chatbot.role("user").content(message);
     const responses = await chatbot.sendChatCompletions();
 
     if (responses) {
-      const joinedResponses = responses.join("");
-      res.json({ chat_response: joinedResponses });
+      res.json({ chat_response: responses });
     } else {
       res.json({
         chat_response: "Sorry, there was an error processing your request.",
@@ -225,6 +225,8 @@ app.post("/chat", async (req, res) => {
     res.status(400).send("Invalid request type");
   }
 });
+
+// Route to handle text-to-speech requests
 
 // Route to handle audio recording
 app.post("/record", upload.single("audio"), (req, res) => {

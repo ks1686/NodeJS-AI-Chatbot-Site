@@ -69,7 +69,19 @@ class AwanLLM {
         botResponses.push(match[1]);
       }
 
-      return botResponses;
+      if (botResponses.length === 0) {
+        throw new Error("No bot responses found in the response");
+      }
+
+      if (botResponses) {
+        const joinedResponses = botResponses.join("");
+
+        // Remove all newline characters
+        const cleanedResponse = joinedResponses.replace(/\n/g, "");
+        return cleanedResponse;
+      } else {
+        throw new Error("No bot responses found in the response");
+      }
     } catch (error) {
       console.error("Error sending chat completions:", error.message);
       return null;
