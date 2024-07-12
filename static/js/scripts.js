@@ -12,12 +12,12 @@ function startRecording() {
         chunks.push(e.data);
       };
       mediaRecorder.onstop = function () {
-        const blob = new Blob(chunks, { type: mediaRecorder.mimeType });
+        const blob = new Blob(chunks, { type: "audio/mpeg" }); // Use correct MIME type
         chunks = [];
 
-        // send the audio to the server
+        // Send the audio to the server
         const formData = new FormData();
-        formData.append("audio", blob, "output.mp3");
+        formData.append("audio", blob, "recording.mp3");
 
         fetch("/record", {
           method: "POST",
@@ -211,8 +211,9 @@ function appendMessage(sender, message) {
 
 // Function to toggle the chat box
 function toggleChat() {
-  var chatContainer = document.getElementById("chat-container");
-  var toggleBtn = document.getElementById("toggle-chat-btn");
+  // get chat container div class (not id)
+  var chatContainer = document.querySelector(".chat-container");
+  var toggleBtn = document.querySelector(".toggle-chat-btn");
 
   chatContainer.classList.toggle("collapsed");
 

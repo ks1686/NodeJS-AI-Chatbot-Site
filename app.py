@@ -175,6 +175,7 @@ def chat_api():
         return "Invalid request", 400
 
 
+# Route to handle audio recording
 @app.route("/record", methods=["POST"])
 def record_audio():
     if "audio" not in flask.request.files:
@@ -221,12 +222,6 @@ def stream_tts():
         ),
         200,
     )
-
-
-# Serve static files
-@app.route("/static/audio/<path:filename>")
-def serve_audio(filename):
-    return flask.send_from_directory(app.config["UPLOAD_FOLDER"], filename)
 
 
 @app.route("/delete_audio", methods=["DELETE"])

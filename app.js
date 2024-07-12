@@ -6,6 +6,7 @@ const path = require("path");
 const dotenv = require("dotenv");
 const AwanLLM = require("./AwanLLM");
 const crypto = require("crypto");
+const multer = require("multer");
 
 // Load environment variables
 dotenv.config();
@@ -25,6 +26,24 @@ app.use(
     saveUninitialized: true,
   })
 );
+
+// Set up storage for multer with a static filename
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/");
+  },
+  filename: (req, file, cb) => {
+    cb(null, "recording.mp3");
+  },
+});
+
+// Initialize upload
+const upload = multer({ storage: storage });
+
+// Ensure the uploads directory exists
+if (!fs.existsSync("uploads")) {
+  fs.mkdirSync("uploads");
+}
 
 // Load the menu data from JSON
 let menuData = [];
@@ -204,6 +223,23 @@ app.post("/chat", async (req, res) => {
     }
   } else {
     res.status(400).send("Invalid request type");
+  }
+});
+
+// Route to handle audio recording
+app.post("/record", upload.single("audio"), (req, res) => {
+  try {
+    // The audio file is saved as "uploads/recording.mp3"
+    const filePath = req.file.path;
+    console.log(`Audio file saved to ${filePath}`);
+
+    // Need to figure out how to convert the audio to text
+
+    // Respond with success and processed text
+    res.json({ message: "Audio recorded successfully", text: "success" });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send("Failed to process the audio");
   }
 });
 

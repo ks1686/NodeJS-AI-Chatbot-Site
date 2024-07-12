@@ -5,8 +5,6 @@ dotenv.config();
 
 AWANLLM_API_KEY = process.env.AWANLLM_API_KEY;
 
-console.log(AWANLLM_API_KEY);
-
 AWANLLM_MODEL = process.env.MODEL_NAME;
 const chatbot = new AwanLLM(AWANLLM_API_KEY, AWANLLM_MODEL);
 

@@ -4,18 +4,27 @@
       position: fixed;
       bottom: 20px; /* Adjust as needed */
       right: 20px; /* Adjust as needed */
-      max-width: 300px; /* Adjust chat box width */
+      width: 350px; /* Adjust chat box width */
+      max-width: 100%; /* Allow it to take full width when expanded */
       background-color: #f9f9f9;
       border: 1px solid #ddd;
       border-radius: 8px;
       padding: 20px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      transition: width 0.3s ease-out; /* Smooth transition for width */
+    }
+
+    .chat-container.collapsed {
+      width: 40px; /* Collapse width to match toggle button */
+      height: 40px; /* Collapse height to match toggle button */
     }
 
     .chat-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      transition: opacity 0.3s ease-out; /* Smooth transition for title */
+      opacity: 1; /* Initially visible */
     }
 
     #chat-title {
@@ -34,8 +43,8 @@
       z-index: 1000; /* Ensure button remains on top */
     }
 
-    .chat-container.collapsed #chat-title {
-      display: none; /* Hide title when chat is collapsed */
+    .chat-container.collapsed .chat-header {
+      opacity: 0; /* Hide title when chat is collapsed */
     }
 
     .chat-content {
@@ -97,7 +106,7 @@
   </style>
 
   <div class="chat-header">
-    <h1>Chat with Us</h1>
+    <h1 id="chat-title">Chat with Us</h1>
   </div>
   <button class="toggle-chat-btn" onclick="toggleChat()">-</button>
   <div class="chat-content">
