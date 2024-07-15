@@ -6,6 +6,8 @@ Deployable e-commerce website that imports a JSON file and allows the user to in
 
 Run in terminal: _npm install_
 
+Install OpenAI Whisper for your device: https://openai.com/index/whisper/
+
 Obtain an API key from https://www.awanllm.com
 
 Create a .env file and assign your API key to _AWANLLM_API_KEY_
