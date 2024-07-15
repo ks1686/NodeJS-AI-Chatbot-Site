@@ -303,8 +303,12 @@ app.post("/record", upload.single("audio"), (req, res) => {
         "utf8"
       );
 
-      //  Delete the audio file
-      fs.unlinkSync(filePath);
+      // Delete the audio file
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          console.error("Error deleting audio file:", err);
+        }
+      });
 
       // Respond with success and processed text
       res.json({ message: "Audio recorded successfully", text: processedText });
