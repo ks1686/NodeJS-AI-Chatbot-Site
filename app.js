@@ -20,6 +20,7 @@ app.set("views", path.join(__dirname, "templates"));
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 app.use(
   session({
     secret: crypto.randomBytes(64).toString("hex"),
@@ -44,6 +45,12 @@ const upload = multer({ storage: storage });
 // Ensure the uploads directory exists
 if (!fs.existsSync("uploads")) {
   fs.mkdirSync("uploads");
+}
+
+// Set up the TTS directory
+const audioDirectory = path.join(__dirname, "static", "audio");
+if (!fs.existsSync(audioDirectory)) {
+  fs.mkdirSync(audioDirectory);
 }
 
 // Load the menu data from JSON
@@ -212,9 +219,12 @@ app.post("/chat", async (req, res) => {
 
     // Add user message to the chat
     chatbot.role("user").content(message);
-    const responses = await chatbot.sendChatCompletions();
+    let responses = await chatbot.sendChatCompletions();
 
     if (responses) {
+      // Remove all newline characters from the responses
+      responses = responses.replace(/\n/g, "");
+
       res.json({ chat_response: responses });
     } else {
       res.json({
@@ -227,6 +237,53 @@ app.post("/chat", async (req, res) => {
 });
 
 // Route to handle text-to-speech requests
+app.post("/tts", async (req, res) => {
+  if (req.is("application/json")) {
+    const text = req.body.text;
+
+    console.log("Text to convert to speech:", text);
+
+    try {
+      // Generate audio file using gtts
+      const gttsObject = new gtts(text, "en");
+      const audioFilePath = path.join(
+        __dirname,
+        "static",
+        "audio",
+        "output.mp3"
+      ); // Adjust the path as needed
+      gttsObject.save(audioFilePath, async (err, result) => {
+        if (err) {
+          console.error("Error saving audio:", err);
+          return res.status(500).json({ error: "Failed to generate audio" });
+        }
+
+        // Serve the audio file URL back to the client
+        const audioUrl = `/audio/output.mp3`;
+        res.json({ audio_url: audioUrl });
+      });
+    } catch (error) {
+      console.error("Error:", error);
+      res.status(500).send("Failed to process the text-to-speech request");
+    }
+  } else {
+    res.status(400).send("Invalid request type");
+  }
+});
+
+// Route to handle deleting the text-to-speech audio file
+app.delete("/delete_audio", async (req, res) => {
+  const audioFilePath = path.join(__dirname, "static", "audio", "output.mp3"); // Adjust the path as needed
+
+  try {
+    // Delete the audio file
+    fs.unlinkSync(audioFilePath);
+    res.json({ message: "Audio file deleted successfully" });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send("Failed to delete the audio file");
+  }
+});
 
 // Route to handle audio recording
 app.post("/record", upload.single("audio"), (req, res) => {

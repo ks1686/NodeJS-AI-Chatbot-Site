@@ -149,7 +149,12 @@ async function sendMessage() {
 
     const data = await response.json();
     // Extract bot message from response, where format is { "chat_response": "message" }
-    const botMessage = data.chat_response;
+    let botMessage = data.chat_response;
+
+    // Remove all double newline characters from the bot message
+    botMessage = botMessage.replace(/\n\n/g, "");
+
+    console.log(botMessage);
 
     // Append bot response to chat box
     appendMessage("Bot", botMessage);

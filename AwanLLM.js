@@ -63,7 +63,7 @@ class AwanLLM {
       const regex = /{"content":"(.*?)"/g;
       let match;
 
-      const botResponses = [];
+      let botResponses = [];
 
       while ((match = regex.exec(responseText)) !== null) {
         botResponses.push(match[1]);
@@ -74,11 +74,12 @@ class AwanLLM {
       }
 
       if (botResponses) {
-        const joinedResponses = botResponses.join("");
+        botResponses = botResponses.join("");
 
         // Remove all newline characters
-        const cleanedResponse = joinedResponses.replace(/\n/g, "");
-        return cleanedResponse;
+        botResponses = botResponses.replace(/\n/g, "");
+        botResponses = botResponses.replace(/\n\n/g, "");
+        return botResponses;
       } else {
         throw new Error("No bot responses found in the response");
       }
