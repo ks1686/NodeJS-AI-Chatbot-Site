@@ -9,5 +9,5 @@ Obtain an API key from https://www.awanllm.com
 Create a .env file and assign your API key to _AWANLLM_API_KEY_
 
 Include:
-_MODEL_NAME=Meta-Llama-3-8B-Instruct_
+_MODEL_NAME=Awanllm-Llama-3-8B-Dolfin_
 in your .env as well.
