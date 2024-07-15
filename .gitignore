@@ -1,11 +1,11 @@
 /qodana.sarif.json
 /qodana.yaml
 /.idea/
-/myenv/
-/__pycache__/
 .env
-output.mp3
-output.wav
+/static/audio/
+/uploads/
+/txt/
+/node_modules/
 private_key.pem
 public_key.pem
 depay_public_key.pem

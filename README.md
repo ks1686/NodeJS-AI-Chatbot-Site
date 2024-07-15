@@ -4,6 +4,8 @@ Deployable e-commerce website that imports a JSON file and allows the user to in
 
 ## For Testing:
 
+Run in terminal: _npm install_
+
 Obtain an API key from https://www.awanllm.com
 
 Create a .env file and assign your API key to _AWANLLM_API_KEY_
