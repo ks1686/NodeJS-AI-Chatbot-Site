@@ -4,7 +4,9 @@ Deployable e-commerce website that imports a JSON file and allows the user to in
 
 ## For Testing:
 
-Run in terminal: _npm install_
+Download the Repo to your local deice
+
+Run in terminal at the file location: _npm install_
 
 Install OpenAI Whisper for your device: https://openai.com/index/whisper/
 
