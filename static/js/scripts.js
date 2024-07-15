@@ -154,8 +154,6 @@ async function sendMessage() {
     // Remove all double newline characters from the bot message
     botMessage = botMessage.replace(/\n\n/g, "");
 
-    console.log(botMessage);
-
     // Append bot response to chat box
     appendMessage("Bot", botMessage);
 

@@ -242,8 +242,6 @@ app.post("/tts", async (req, res) => {
   if (req.is("application/json")) {
     const text = req.body.text;
 
-    console.log("Text to convert to speech:", text);
-
     try {
       // Generate audio file using gtts
       const gttsObject = new gtts(text, "en");
@@ -291,7 +289,6 @@ app.post("/record", upload.single("audio"), (req, res) => {
   try {
     // The audio file is saved as "uploads/recording.mp3"
     const filePath = req.file.path;
-    console.log(`Audio file saved to ${filePath}`);
 
     // Run CLI Whisper commands
     exec(`whisper -otxt -f txt ${filePath}`, (error, stdout, stderr) => {
