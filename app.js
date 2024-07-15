@@ -8,6 +8,7 @@ const crypto = require("crypto");
 const bodyParser = require("body-parser");
 const AwanLLM = require("./AwanLLM");
 const gtts = require("gtts");
+const { exec } = require("child_process");
 
 // Load environment variables
 dotenv.config();
@@ -292,10 +293,25 @@ app.post("/record", upload.single("audio"), (req, res) => {
     const filePath = req.file.path;
     console.log(`Audio file saved to ${filePath}`);
 
-    // Need to figure out how to convert the audio to text
+    // Run CLI Whisper commands
+    exec(`whisper -otxt -f txt ${filePath}`, (error, stdout, stderr) => {
+      if (error) {
+        console.error("Error processing audio:", error);
+        return res.status(500).send("Failed to process the audio");
+      }
 
-    // Respond with success and processed text
-    res.json({ message: "Audio recorded successfully", text: "success" });
+      // Process the output text (located in /txt/recording.txt)
+      const processedText = fs.readFileSync(
+        path.join(__dirname, "txt", "recording.txt"),
+        "utf8"
+      );
+
+      //  Delete the audio file
+      fs.unlinkSync(filePath);
+
+      // Respond with success and processed text
+      res.json({ message: "Audio recorded successfully", text: processedText });
+    });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send("Failed to process the audio");
