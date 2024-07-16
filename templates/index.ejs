@@ -61,7 +61,11 @@
     <script src="/js/scripts.js"></script>
     <script>
       // Fetch menu data from server
-      fetch("/menu")
+      const urlParams = new URLSearchParams(window.location.search);
+      const menuParam = urlParams.get("menu");
+      const fetchUrl = menuParam ? `/menu?menu=${menuParam}` : "/menu";
+
+      fetch(fetchUrl)
         .then((response) => response.json())
         .then((data) => {
           const categoryContainer = document.getElementById("category-buttons");
@@ -71,7 +75,9 @@
           data.forEach((item) => {
             if (item.in_stock && !existingCategories.has(item.category)) {
               const categoryButton = document.createElement("a");
-              categoryButton.href = `/category/${item.category}`;
+              categoryButton.href = `/category/${item.category}?menu=${
+                menuParam || "menu"
+              }`;
               categoryButton.classList.add("category-button");
               categoryButton.textContent = item.category;
               categoryContainer.appendChild(categoryButton);

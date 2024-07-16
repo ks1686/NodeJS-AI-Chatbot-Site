@@ -56,25 +56,39 @@ if (!fs.existsSync(audioDirectory)) {
   fs.mkdirSync(audioDirectory);
 }
 
-// Load the menu data from JSON
-let menuData = [];
-let menuText = ""; // Declare the variable outside try-catch to access later
+// Declare chatbot variables
+let chatbot;
 
+// Function to load menu data based on parameter
+function loadMenuData(menuParam) {
+let menuData = [];
+  let menuText = "";
+
+  const menuFileName = menuParam ? `${menuParam}.json` : "menu.json";
 try {
-  const data = fs.readFileSync("menu.json", "utf8");
+    const data = fs.readFileSync(menuFileName, "utf8");
   menuData = JSON.parse(data).data;
 
   // Generate formatted menu text
   menuText = menuData
     .filter((item) => item.in_stock)
     .map(
-      (item) => `${item.item}: $${item.price.toFixed(2)} - ${item.description}`
+        (item) =>
+          `${item.item}: $${item.price.toFixed(2)} - ${item.description}`
     )
     .join("\n");
 } catch (err) {
-  console.error(err);
+    console.error(`Error loading menu file: ${menuFileName}`, err);
   process.exit(1);
 }
+
+  return { menuData, menuText };
+}
+
+// Route to load the main page
+app.get("/", (req, res) => {
+  const menuParam = req.query.menu;
+  const { menuData, menuText } = loadMenuData(menuParam);
 
 // Initialize LLM Chat Client
 const LLM_API_KEY = process.env.AWANLLM_API_KEY;
@@ -83,25 +97,27 @@ if (!LLM_API_KEY || !LLM_MODEL) {
   console.error("No API key or model name found.");
   process.exit(1);
 }
-const chatbot = new AwanLLM(LLM_API_KEY, LLM_MODEL);
+  chatbot = new AwanLLM(LLM_API_KEY, LLM_MODEL);
 chatbot.role("system").content("Here is our menu:\n" + menuText);
 
-// Route to load the main page
-app.get("/", (req, res) => {
   res.render("index.ejs", {
     title: "Main Page", // Set the title for index.ejs
     hide_cart_button: false, // Adjust based on your logic
-    // You can pass additional data to index.ejs here if needed
+    menuData, // Pass the menu data to index.ejs
   });
 });
 
 // Route to serve the menu data
 app.get("/menu", (req, res) => {
+  const menuParam = req.query.menu;
+  const { menuData } = loadMenuData(menuParam);
   res.json(menuData.filter((item) => item.in_stock));
 });
 
 // Route to handle category selection
 app.get("/category/:category_name", (req, res) => {
+  const menuParam = req.query.menu;
+  const { menuData } = loadMenuData(menuParam);
   const category_name = req.params.category_name;
   const items_in_category = menuData.filter(
     (item) => item.category === category_name && item.in_stock
@@ -109,6 +125,7 @@ app.get("/category/:category_name", (req, res) => {
   res.render("category_items.ejs", {
     category_name: category_name,
     items: items_in_category,
+    menuParam: menuParam || "menu", // Pass the menu parameter to the template
   });
 });
 

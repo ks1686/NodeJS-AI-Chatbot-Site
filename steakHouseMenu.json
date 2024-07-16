@@ -1,0 +1,39 @@
+{
+  "data": [
+    {
+      "item": "Sirloin Steak",
+      "price": 29.99,
+      "in_stock": true,
+      "category": "Entree",
+      "description": "A juicy sirloin steak cooked to perfection"
+    },
+    {
+      "item": "Lobster Mac and Cheese",
+      "price": 13.99,
+      "in_stock": true,
+      "category": "Side",
+      "description": "A side of creamy and savorylobster mac and cheese"
+    },
+    {
+      "item": "Pinot Noir",
+      "price": 9.99,
+      "in_stock": true,
+      "category": "Drink",
+      "description": "A glass of smooth and fruity pinot noir"
+    },
+    {
+      "item": "Chocolate Lava Cake",
+      "price": 6.99,
+      "in_stock": true,
+      "category": "Dessert",
+      "description": "A decadent chocolate lava cake"
+    },
+    {
+      "item": "Caesar Salad",
+      "price": 12.99,
+      "in_stock": true,
+      "category": "Entree",
+      "description": "A classic Caesar salad with grilled chicken"
+    }
+  ]
+}
