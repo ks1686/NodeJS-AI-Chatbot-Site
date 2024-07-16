@@ -9,6 +9,7 @@ const bodyParser = require("body-parser");
 const AwanLLM = require("./AwanLLM");
 const gtts = require("gtts");
 const { exec } = require("child_process");
+const uuid = require("uuid");
 
 // Load environment variables
 dotenv.config();
