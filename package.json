@@ -10,7 +10,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@depay/js-verify-signature": "^3.1.8",
     "axios": "^1.7.2",
     "body-parser": "^1.20.2",
     "crypto": "^1.0.1",
