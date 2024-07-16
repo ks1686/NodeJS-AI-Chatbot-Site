@@ -95,6 +95,11 @@ app.get("/", (req, res) => {
   });
 });
 
+// Route to serve the menu data
+app.get("/menu", (req, res) => {
+  res.json(menuData.filter((item) => item.in_stock));
+});
+
 // Route to handle category selection
 app.get("/category/:category_name", (req, res) => {
   const category_name = req.params.category_name;
