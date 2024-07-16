@@ -6,8 +6,30 @@
     <title><%= category_name %> Items</title>
     <style>
       /* Embedded CSS styles */
+      .cart-button-container {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        z-index: 1000;
+      }
+
+      .cart-button {
+        display: inline-block;
+        margin: 5px;
+        padding: 90px 100px; /* Keeping original size */
+        font-size: 40px; /* Keeping original size */
+        cursor: pointer;
+        text-align: center;
+        text-decoration: none;
+        color: white;
+        background-color: #007bff;
+        border: none;
+        border-radius: 5px;
+      }
+
       #items-container {
         font-size: 1.4em; /* Increase the base font size */
+        margin-top: 120px; /* Ensure content doesn't overlap the fixed button */
       }
 
       #items-container ul {
@@ -55,6 +77,10 @@
     </style>
   </head>
   <body>
+    <div class="cart-button-container">
+      <a href="/view_cart" class="cart-button">View Cart</a>
+    </div>
+
     <h1><%= category_name %> Items</h1>
     <div id="items-container">
       <ul>

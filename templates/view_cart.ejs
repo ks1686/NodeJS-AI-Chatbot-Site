@@ -53,6 +53,65 @@
       .category-button:hover {
         background-color: #ddd;
       }
+
+      .pay-button {
+        font-size: 1.5em; /* Increase button font size */
+        display: block; /* Make the button block-level */
+        width: 100%; /* Full-width button */
+        padding: 15px 20px; /* Adjust padding for better button size */
+        text-decoration: none;
+        background-color: #28a745; /* Green background */
+        border: none;
+        color: white;
+        text-align: center;
+        margin-top: 20px; /* Space above the button */
+        cursor: pointer;
+      }
+
+      .pay-button:hover {
+        background-color: #218838; /* Darker green on hover */
+      }
+
+      .popup {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: white;
+        padding: 20px;
+        border: 1px solid #ccc;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        z-index: 1000; /* Ensure popup is on top */
+        display: none; /* Hidden by default */
+      }
+
+      .error-popup {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #f8d7da;
+        color: #721c24;
+        padding: 20px;
+        border: 1px solid #f5c6cb;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        z-index: 1000; /* Ensure popup is on top */
+        display: none; /* Hidden by default */
+      }
+
+      .error-popup p {
+        margin: 0;
+        font-size: 1.2em;
+      }
+
+      .error-popup button {
+        margin-top: 10px;
+        padding: 10px 20px;
+        background-color: #721c24;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
     </style>
   </head>
   <body>
@@ -112,6 +171,25 @@
       </ul>
     </div>
     <a href="/" class="category-button">Back to Categories</a>
+    <% if (cart && cart.length > 0) { %>
+    <form id="paymentForm" action="/process_payment" method="post">
+      <input type="hidden" id="totalInput" name="total" value="<%= total %>" />
+      <button type="submit" class="pay-button">Pay</button>
+    </form>
+    <% } %>
+
+    <div id="paymentSuccessPopup" class="popup">
+      <p>Payment Successful!</p>
+      <p>Card Number: <span id="cardNumber"></span></p>
+      <p>Authorized Amount: <span id="authorizedAmount"></span></p>
+      <button onclick="hidePopup('paymentSuccessPopup')">OK</button>
+    </div>
+
+    <div id="paymentErrorPopup" class="error-popup">
+      <p>Payment Failed!</p>
+      <p>Please try again later.</p>
+      <button onclick="hidePopup('paymentErrorPopup')">OK</button>
+    </div>
 
     <script>
       function handleFormSubmit(event) {
@@ -134,6 +212,52 @@
 
         // Submit the form
         form.submit();
+      }
+
+      document
+        .getElementById("paymentForm")
+        .addEventListener("submit", function (event) {
+          event.preventDefault(); // Prevent default form submission
+
+          // Fetch API to send payment request
+          fetch("/process_payment", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              total: document.getElementById("totalInput").value,
+            }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.success) {
+                // Payment successful, show popup with details
+                document.getElementById("cardNumber").textContent =
+                  data.cardNum;
+                document.getElementById("authorizedAmount").textContent =
+                  data.authAmount;
+                document.getElementById("paymentSuccessPopup").style.display =
+                  "block";
+              } else {
+                // Payment failed, show error popup
+                document.getElementById("paymentErrorPopup").style.display =
+                  "block";
+              }
+            })
+            .catch((error) => {
+              console.error("Error processing payment:", error);
+            });
+        });
+
+      // Function to hide any popup by ID
+      function hidePopup(popupId) {
+        document.getElementById(popupId).style.display = "none";
+
+        // if the ID is the paymentSuccessPopup, redirect to the home page
+        if (popupId === "paymentSuccessPopup") {
+          window.location.href = "/";
+        }
       }
     </script>
   </body>
