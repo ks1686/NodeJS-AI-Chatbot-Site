@@ -10,6 +10,7 @@ const AwanLLM = require("./AwanLLM");
 const gtts = require("gtts");
 const { exec } = require("child_process");
 const uuid = require("uuid");
+const axios = require("axios");
 
 // Load environment variables
 dotenv.config();
@@ -320,6 +321,56 @@ app.post("/record", upload.single("audio"), (req, res) => {
   }
 });
 
+// Route to handle the payment process
+app.post("/process_payment", async (req, res) => {
+  // Get the total amount from the request body
+  const total = req.body.total;
+
+  // Generate a unique ID for the transaction
+  const guid = uuid.v4();
+
+  try {
+    // Make POST request to payment gateway
+    const response = await axios.post(paymentGatewayUrl, paymentData);
+
+    // Check if the payment was successful
+    if (response.data.TransactionResult === "APPROVED") {
+      const cardNum = response.data.CardNumber;
+      const authAmount = response.data.AuthorizedAmount;
+
+      // Clear the cart
+      req.session.cart = [];
+
+      // Save the session
+      req.session.save((err) => {
+        if (err) {
+          console.error(err);
+          return res.status(500).send("Failed to save the cart");
+        }
+      });
+
+      // Send JSON response with payment details
+      res.json({
+        success: true,
+        message: "Payment successful",
+        cardNum: cardNum,
+        authAmount: authAmount,
+      });
+    } else {
+      // Payment failed
+      res.status(400).json({
+        success: false,
+        message: "Payment failed",
+      });
+    }
+  } catch (error) {
+    console.error("Error processing payment:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to process the payment",
+    });
+  }
+});
 // Start the server
 const PORT = 8000;
 app.listen(PORT, () => {
