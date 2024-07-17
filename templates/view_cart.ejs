@@ -170,7 +170,9 @@
         <% } %>
       </ul>
     </div>
-    <a href="/" class="category-button">Back to Categories</a>
+    <a href="/?menu=<%= menuParam %>" class="category-button"
+      >Back to Categories</a
+    >
     <% if (cart && cart.length > 0) { %>
     <form id="paymentForm" action="/process_payment" method="post">
       <input type="hidden" id="totalInput" name="total" value="<%= total %>" />

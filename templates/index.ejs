@@ -44,7 +44,7 @@
     </style>
   </head>
   <body>
-    <a href="/view_cart" class="cart-button">View Cart</a>
+    <a id="view-cart-button" href="/view_cart" class="cart-button">View Cart</a>
 
     <h1>Menu Categories</h1>
     <div class="center-content">
@@ -85,6 +85,10 @@
               existingCategories.add(item.category); // Add category to set
             }
           });
+
+          // Update the "View Cart" button with the menu parameter
+          const viewCartButton = document.getElementById("view-cart-button");
+          viewCartButton.href = `/view_cart?menu=${menuParam || "menu"}`;
         })
         .catch((error) => console.error("Error fetching menu data:", error));
     </script>

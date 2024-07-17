@@ -78,7 +78,9 @@
   </head>
   <body>
     <div class="cart-button-container">
-      <a href="/view_cart" class="cart-button">View Cart</a>
+      <a id="view-cart-button" href="/view_cart" class="cart-button"
+        >View Cart</a
+      >
     </div>
 
     <h1><%= category_name %> Items</h1>
@@ -115,5 +117,13 @@
         </li>
       </ul>
     </div>
+    <script>
+      const urlParams = new URLSearchParams(window.location.search);
+      const menuParam = urlParams.get("menu");
+
+      // Update the "View Cart" button with the menu parameter
+      const viewCartButton = document.getElementById("view-cart-button");
+      viewCartButton.href = `/view_cart?menu=${menuParam || "menu"}`;
+    </script>
   </body>
 </html>

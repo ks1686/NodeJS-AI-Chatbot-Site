@@ -32,6 +32,25 @@ app.use(
   })
 );
 
+// Middleware to clear cart if menu parameter changes
+app.use((req, res, next) => {
+  const newMenuParam = req.query.menu;
+  const oldMenuParam = req.session.menuParam;
+
+  console.log("New menu param:", newMenuParam);
+  console.log("Old menu param:", oldMenuParam);
+
+  // Clear cart if the menu parameter has changed
+  if (newMenuParam && oldMenuParam && newMenuParam !== oldMenuParam) {
+    req.session.cart = [];
+  }
+
+  // Update session with the current menu parameter
+  req.session.menuParam = newMenuParam;
+
+  next();
+});
+
 // Set up storage for multer with a static filename
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -61,26 +80,26 @@ let chatbot;
 
 // Function to load menu data based on parameter
 function loadMenuData(menuParam) {
-let menuData = [];
+  let menuData = [];
   let menuText = "";
 
   const menuFileName = menuParam ? `${menuParam}.json` : "menu.json";
-try {
+  try {
     const data = fs.readFileSync(menuFileName, "utf8");
-  menuData = JSON.parse(data).data;
+    menuData = JSON.parse(data).data;
 
-  // Generate formatted menu text
-  menuText = menuData
-    .filter((item) => item.in_stock)
-    .map(
+    // Generate formatted menu text
+    menuText = menuData
+      .filter((item) => item.in_stock)
+      .map(
         (item) =>
           `${item.item}: $${item.price.toFixed(2)} - ${item.description}`
-    )
-    .join("\n");
-} catch (err) {
+      )
+      .join("\n");
+  } catch (err) {
     console.error(`Error loading menu file: ${menuFileName}`, err);
-  process.exit(1);
-}
+    process.exit(1);
+  }
 
   return { menuData, menuText };
 }
@@ -90,15 +109,15 @@ app.get("/", (req, res) => {
   const menuParam = req.query.menu;
   const { menuData, menuText } = loadMenuData(menuParam);
 
-// Initialize LLM Chat Client
-const LLM_API_KEY = process.env.AWANLLM_API_KEY;
-const LLM_MODEL = process.env.MODEL_NAME;
-if (!LLM_API_KEY || !LLM_MODEL) {
-  console.error("No API key or model name found.");
-  process.exit(1);
-}
+  // Initialize LLM Chat Client
+  const LLM_API_KEY = process.env.AWANLLM_API_KEY;
+  const LLM_MODEL = process.env.MODEL_NAME;
+  if (!LLM_API_KEY || !LLM_MODEL) {
+    console.error("No API key or model name found.");
+    process.exit(1);
+  }
   chatbot = new AwanLLM(LLM_API_KEY, LLM_MODEL);
-chatbot.role("system").content("Here is our menu:\n" + menuText);
+  chatbot.role("system").content("Here is our menu:\n" + menuText);
 
   res.render("index.ejs", {
     title: "Main Page", // Set the title for index.ejs
@@ -131,6 +150,7 @@ app.get("/category/:category_name", (req, res) => {
 
 // Route to view the cart, transaction total, and hide_cart_button
 app.get("/view_cart", (req, res) => {
+  const menuParam = req.query.menu;
   let total = 0;
   if (req.session.cart) {
     req.session.cart.forEach((item) => {
@@ -142,6 +162,7 @@ app.get("/view_cart", (req, res) => {
     cart: req.session.cart,
     total: total.toFixed(2),
     hide_cart_button: true,
+    menuParam: menuParam || "menu", // Pass the menu parameter to the template
   });
 });
 
