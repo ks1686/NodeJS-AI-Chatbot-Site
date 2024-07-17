@@ -134,18 +134,16 @@
             onsubmit="return handleFormSubmit(event)"
           >
             <input type="hidden" name="item_name" value="<%= item.name %>" />
-            <label>
-              <input
-                type="number"
-                name="new_quantity"
-                onkeydown="return standardKeyHandler(this, event) || isNumber(event) && !(this.value.length >= 2);"
-                onpaste="return handleNumericPaste(event)"
-                onblur="return refillTextBox(this)"
-                value="<%= item.quantity %>"
-                min="0"
-                max="99"
-              />
-            </label>
+            <input
+              type="number"
+              name="new_quantity"
+              onkeydown="return standardKeyHandler(this, event) || isNumber(event) && !(this.value.length >= 2);"
+              onpaste="return handleNumericPaste(event)"
+              onblur="return refillTextBox(this)"
+              value="<%= item.quantity %>"
+              min="0"
+              max="99"
+            />
             <button type="submit">Update Quantity</button>
             <% if (item.quantity > 0) { %>
             <button
@@ -178,6 +176,11 @@
       <input type="hidden" id="totalInput" name="total" value="<%= total %>" />
       <button type="submit" class="pay-button">Pay</button>
     </form>
+
+    <div id="depay-container">
+      <button id="depay-button" style="font-size: 3rem">Pay With Crypto</button>
+    </div>
+
     <% } %>
 
     <div id="paymentSuccessPopup" class="popup">
@@ -193,6 +196,11 @@
       <button onclick="hidePopup('paymentErrorPopup')">OK</button>
     </div>
 
+    <script
+      defer
+      async
+      src="https://integrate.depay.com/widgets/v12.js"
+    ></script>
     <script>
       function handleFormSubmit(event) {
         event.preventDefault(); // Prevent default form submission
@@ -251,6 +259,23 @@
               console.error("Error processing payment:", error);
             });
         });
+
+      // Function to handle Depay widget configuration
+      document.addEventListener("DOMContentLoaded", function () {
+        const depayButton = document.getElementById("depay-button");
+
+        depayButton.addEventListener("click", function () {
+          const totalValue = "<%= total %>";
+          const sanitizedTotal = totalValue.replace(/\"/g, "&quot;");
+
+          DePayWidgets.Payment({
+            integration: "<%= integrationId %>",
+            payload: JSON.stringify({
+              total: sanitizedTotal,
+            }),
+          });
+        });
+      });
 
       // Function to hide any popup by ID
       function hidePopup(popupId) {
