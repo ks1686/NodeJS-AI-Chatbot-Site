@@ -11,6 +11,7 @@ const gtts = require("gtts");
 const { exec } = require("child_process");
 const uuid = require("uuid");
 const axios = require("axios");
+const { verify } = require("@depay/js-verify-signature");
 
 // Load environment variables
 dotenv.config();
@@ -61,22 +62,27 @@ const storage = multer.diskStorage({
   },
 });
 
-// Initialize upload
+// Initialize upload and create audio directory
 const upload = multer({ storage: storage });
-
-// Ensure the uploads directory exists
+const audioDirectory = path.join(__dirname, "static", "audio");
 if (!fs.existsSync("uploads")) {
   fs.mkdirSync("uploads");
 }
-
-// Set up the TTS directory
-const audioDirectory = path.join(__dirname, "static", "audio");
 if (!fs.existsSync(audioDirectory)) {
   fs.mkdirSync(audioDirectory);
 }
 
 // Declare chatbot variables
 let chatbot;
+
+// Identify the integration for Depay crypto gateway
+const integrationId = process.env.DEPAY_INTEGRATION_ID;
+
+// Provided public key from Depay, loaded from depay_public_key.pem
+const publicKey = process.env.DEPAY_PUBLIC_KEY;
+
+// Private key to sign and authenticate communication with Depay
+const privateKey = process.env.PRIVATE_KEY;
 
 // Function to load menu data based on parameter
 function loadMenuData(menuParam) {
@@ -163,6 +169,7 @@ app.get("/view_cart", (req, res) => {
     total: total.toFixed(2),
     hide_cart_button: true,
     menuParam: menuParam || "menu", // Pass the menu parameter to the template
+    integrationId: integrationId,
   });
 });
 
@@ -372,6 +379,20 @@ app.post("/process_payment", async (req, res) => {
   // Generate a unique ID for the transaction
   const guid = uuid.v4();
 
+  const paymentGatewayUrl = process.env.PAYMENT_GATEWAY_URL;
+
+  const paymentData = {
+    Version: "1.0",
+    MerchantId: process.env.MERCHANT_ID,
+    TerminalId: process.env.TERMINAL_ID,
+    Identification: process.env.IDENTIFICATION,
+    UniqueId: guid,
+    TenderType: "2",
+    TransactionType: "1",
+    SaleAmount: total,
+    Timeout: "-1",
+  };
+
   try {
     // Make POST request to payment gateway
     const response = await axios.post(paymentGatewayUrl, paymentData);
@@ -414,6 +435,10 @@ app.post("/process_payment", async (req, res) => {
     });
   }
 });
+
+// Payment endpoint for the cryptocurrency payment to communicate to
+app.post("/depay/endpoint", (req, res) => {});
+
 // Start the server
 const PORT = 8000;
 app.listen(PORT, () => {
