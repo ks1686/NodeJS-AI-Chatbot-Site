@@ -38,9 +38,6 @@ app.use((req, res, next) => {
   const newMenuParam = req.query.menu;
   const oldMenuParam = req.session.menuParam;
 
-  console.log("New menu param:", newMenuParam);
-  console.log("Old menu param:", oldMenuParam);
-
   // Clear cart if the menu parameter has changed
   if (newMenuParam && oldMenuParam && newMenuParam !== oldMenuParam) {
     req.session.cart = [];
@@ -75,14 +72,42 @@ if (!fs.existsSync(audioDirectory)) {
 // Declare chatbot variables
 let chatbot;
 
-// Identify the integration for Depay crypto gateway
-const integrationId = process.env.DEPAY_INTEGRATION_ID;
+// All needed environment variables for Depay (keys from pem file)
+const integrationId = process.env.DEPAY_INTEGRATION_ID.toString();
+const publicKey = fs.readFileSync("keys/depay_public_key.pem").toString();
+const privateKey = fs.readFileSync("keys/private_key.pem").toString();
 
-// Provided public key from Depay, loaded from depay_public_key.pem
-const publicKey = process.env.DEPAY_PUBLIC_KEY;
+// Function to verify request and get response signature from Depay
+const verifyDepayRequest = async (req) => {
+  let verified = await verify({
+    signature: req.headers["x-signature"],
+    data: req.body,
+    publicKey,
+  });
 
-// Private key to sign and authenticate communication with Depay
-const privateKey = process.env.PRIVATE_KEY;
+  if (!verified) {
+    // Log an Express error for Depay request verification failed
+    console.error("Depay request verification failed");
+  }
+
+  return verified;
+};
+
+const getDepayResponseSignature = (responseString) => {
+  const signature = crypto.sign("sha256", Buffer.from(responseString), {
+    key: privateKey,
+    padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
+    saltLength: 64,
+  });
+
+  const urlSafeBase64Signature = signature
+    .toString("base64")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/, "");
+
+  return urlSafeBase64Signature;
+};
 
 // Function to load menu data based on parameter
 function loadMenuData(menuParam) {
@@ -157,6 +182,8 @@ app.get("/category/:category_name", (req, res) => {
 // Route to view the cart, transaction total, and hide_cart_button
 app.get("/view_cart", (req, res) => {
   const menuParam = req.query.menu;
+  const guid = uuid.v4();
+
   let total = 0;
   if (req.session.cart) {
     req.session.cart.forEach((item) => {
@@ -170,6 +197,7 @@ app.get("/view_cart", (req, res) => {
     hide_cart_button: true,
     menuParam: menuParam || "menu", // Pass the menu parameter to the template
     integrationId: integrationId,
+    guid: guid,
   });
 });
 
@@ -376,8 +404,8 @@ app.post("/process_payment", async (req, res) => {
   // Get the total amount from the request body
   const total = req.body.total;
 
-  // Generate a unique ID for the transaction
-  const guid = uuid.v4();
+  // Pull the GUID from the request body
+  const guid = req.body.guid;
 
   const paymentGatewayUrl = process.env.PAYMENT_GATEWAY_URL;
 
@@ -437,7 +465,36 @@ app.post("/process_payment", async (req, res) => {
 });
 
 // Payment endpoint for the cryptocurrency payment to communicate to
-app.post("/depay/endpoint", (req, res) => {});
+app.post("/depay/endpoint", async (req, res) => {
+  if (!(await verifyDepayRequest(req))) {
+    return res.status(400).send("Unauthorized request");
+  }
+
+  const configuration = {
+    amount: {
+      currency: "USD",
+      fix: req.body.total,
+    },
+    accept: [
+      {
+        blockchain: "ethereum",
+        token: "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        receiver: "0x4e260bB2b25EC6F3A59B478fCDe5eD5B8D783B02",
+      },
+      {
+        blockchain: "ethereum",
+        token: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+        receiver: "0x4e260bB2b25EC6F3A59B478fCDe5eD5B8D783B02",
+      },
+    ],
+  };
+
+  res.setHeader(
+    "x-signature",
+    getDepayResponseSignature(JSON.stringify(configuration))
+  );
+  res.status(200).json(configuration);
+});
 
 // Start the server
 const PORT = 8000;

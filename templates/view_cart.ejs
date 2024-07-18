@@ -237,6 +237,7 @@
             },
             body: JSON.stringify({
               total: document.getElementById("totalInput").value,
+              guid: "<%= guid %>",
             }),
           })
             .then((response) => response.json())
@@ -272,6 +273,7 @@
             integration: "<%= integrationId %>",
             payload: JSON.stringify({
               total: sanitizedTotal,
+              guid: "<%= guid %>",
             }),
           });
         });
