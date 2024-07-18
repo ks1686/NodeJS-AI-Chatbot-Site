@@ -11,7 +11,7 @@ const gtts = require("gtts");
 const { exec } = require("child_process");
 const uuid = require("uuid");
 const axios = require("axios");
-//const { verify } = require("@depay/js-verify-signature");
+const { verify } = require("@depay/js-verify-signature");
 
 // Load environment variables
 dotenv.config();
@@ -74,43 +74,21 @@ let chatbot;
 
 // All needed environment variables for Depay (keys from pem file)
 const integrationId = process.env.DEPAY_INTEGRATION_ID.toString();
-const privateKey = fs.readFileSync("keys/private_key.pem").toString();
+const privateKey = fs.readFileSync("keys/private_key.pem");
+const public_key = fs.readFileSync("keys/depay_public_key.pem");
 
 // Function to verify request and get response signature from Depay
 const verifyDepayRequest = async (req) => {
   const signature = req.headers["x-signature"].toString();
   const data = req.body;
-  const public_key = `-----BEGIN PUBLIC KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1iMx4OGf5yMZvpiaoLnn
-ejSDvc2Ha47nVmtVyvzqKH98qLjeinCZjIr4dXazFBl8ao+u/YjDMiKHGRWI/iAz
-IRmgTXjItzEMuxrZbwmp/tGCtlxnxapWADd2nHzcw4x8/f01gWc00z0NgrqOcx3+
-XRJW5qj8JQjI+VPwmJE4JkARyIF34Bm1Aoc/TscOLFNnUCeoQOtrOrQ0zD5MjKg3
-aDb0HYwRduaNEkRy0BG9QH0Wh54B53kQJnmTdS8yKh/3siNlBsPj+H7g2kWzbyBy
-nNFzZ994xJ60HdZ5F4Jn4VTeeVwFS7Bk81B1xuSFtfhdMe2Ash4qkLyQZNcz+RCn
-jQIDAQAB
------END PUBLIC KEY-----`;
   console.log("Request signature: ", signature);
   console.log("Request body: ", data);
 
-  // let verified = await verify({
-  //   signature: req.headers["x-signature"],
-  //   data: req.body,
-  //   public_key,
-  // });
-
-  const decodedSignature = Buffer.from(signature, "base64url");
-  const verifier = crypto.createVerify("RSA-SHA256");
-  verifier.update(JSON.stringify(data));
-  verifier.end();
-
-  const verified = verifier.verify(
-    {
-      key: public_key,
-      padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
-      saltLength: 64,
-    },
-    decodedSignature
-  );
+  let verified = await verify({
+    signature: req.headers["x-signature"],
+    data: req.body,
+    public_key,
+  });
 
   if (!verified) {
     // Log an Express error for Depay request verification failed
