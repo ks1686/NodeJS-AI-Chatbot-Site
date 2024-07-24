@@ -1,6 +1,8 @@
-# E-Commerce Site with AI Chatbot
+# E-Commerce Site with AI Chatbot and Payments
 
 Deployable e-commerce website that imports a JSON file and allows the user to interact with items by adding to cart, editing cart, and more. An AI chatbot assistant is available in a collapsable view to assist with user queries or prompts.
+
+Payments have been enabled to allow for accepting cryptocurrency and credit card payments.
 
 ## For Testing:
 
