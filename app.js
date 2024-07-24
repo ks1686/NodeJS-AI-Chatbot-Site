@@ -84,11 +84,11 @@ const verifyDepayRequest = async (req) => {
   const data = req.body;
 
   /* Custom module that doesn't work, Depay docs (https://github.com/DePayFi/js-verify-RSA-PSS-SHA256#functionoality)
-  // let verified = await verify({
-  //   signature: req.headers["x-signature"],
-  //   data: JSON.stringify(data),
-  //   public_key,
-  // });
+  let verified = await verify({
+     signature: req.headers["x-signature"],
+     data: JSON.stringify(data),
+     public_key,
+  });
   */
 
   const verify = crypto.createVerify("RSA-SHA256");
