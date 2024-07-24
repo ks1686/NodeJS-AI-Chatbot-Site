@@ -1,5 +1,6 @@
 const express = require("express");
 const session = require("express-session");
+const http = require("http");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
@@ -20,6 +21,8 @@ dotenv.config();
 
 // Initialize Express
 const app = express();
+const server = http.createServer(app);
+const io = require("socket.io")(server);
 app.use(express.static(path.join(__dirname, "static")));
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "templates"));
@@ -193,6 +196,8 @@ app.get("/category/:category_name", (req, res) => {
 app.get("/view_cart", (req, res) => {
   const menuParam = req.query.menu;
   const guid = uuid.v4();
+
+  console.log("GUID:", guid);
 
   let total = 0;
   if (req.session.cart) {
@@ -460,7 +465,7 @@ app.post("/process_payment", async (req, res) => {
   }
 });
 
-// Payment endpoint for the cryptocurrency payment to communicate to
+// Payment endpoint for the cryptocurrency configuration
 app.post("/depay/endpoint", async (req, res) => {
   if (!(await verifyDepayRequest(req))) {
     return res.status(400).send("Unauthorized request");
@@ -492,9 +497,62 @@ app.post("/depay/endpoint", async (req, res) => {
   res.status(200).json(configuration);
 });
 
+// Payment endpoint for events in the cryptocurrency payment
+app.post("/depay/events", async (req, res) => {
+  if (!(await verifyDepayRequest(req))) {
+    return res.status(400).send("Unauthorized request");
+  }
+
+  try {
+    const transaction = req.body;
+    const payload = transaction.payload;
+
+    // Get the transaction details from the request body
+    const total = payload.total;
+    const guid = payload.guid;
+    const blockchain = transaction.blockchain;
+    const txhash = transaction.transaction;
+    const sender = transaction.sender;
+    const created_at = transaction.created_at;
+    const confirmed_at = transaction.confirmed_at;
+    const status = transaction.status;
+
+    // Clear the cart
+    req.session.cart = [];
+
+    // Save the session
+    req.session.save((err) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).send("Failed to save the cart");
+      }
+    });
+
+    // Emit transaction status to the frontend
+    io.emit("transaction", {
+      total,
+      guid,
+      blockchain,
+      txhash,
+      sender,
+      created_at,
+      confirmed_at,
+      status,
+    });
+
+    // Respond with a 200 status to Depay
+    if (status === "succeeded") {
+      res.status(200).send("Transaction succeeded");
+    }
+  } catch (error) {
+    console.error("Error processing Depay event:", error);
+    return res.status(500).send("Failed to process the Depay event");
+  }
+});
+
 // Start the server
 const PORT = 8000;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
   console.log(`Ngrok domain: https://noticeably-hardy-sunbird.ngrok-free.app`);
 });
