@@ -11,7 +11,9 @@ const gtts = require("gtts");
 const { exec } = require("child_process");
 const uuid = require("uuid");
 const axios = require("axios");
-const { verify } = require("@depay/js-verify-signature");
+/* Custom Depay module that doesn't seem to work
+const { verify } = require("@depay/js-verify-signature"); 
+*/
 
 // Load environment variables
 dotenv.config();
@@ -84,18 +86,24 @@ const verifyDepayRequest = async (req) => {
   console.log("Request signature: ", signature);
   console.log("Request body: ", data);
 
-  let verified = await verify({
-    signature: req.headers["x-signature"],
-    data: req.body,
-    public_key,
-  });
+  /* Custom module that doesn't work, Depay docs (https://github.com/DePayFi/js-verify-RSA-PSS-SHA256#functionoality)
+  // let verified = await verify({
+  //   signature: req.headers["x-signature"],
+  //   data: JSON.stringify(data),
+  //   public_key,
+  // });
+  */
 
-  if (!verified) {
+  const verify = crypto.createVerify("RSA-SHA256");
+  verify.update(JSON.stringify(data));
+  verify.verify(public_key, req.headers["x-signature"], "base64");
+
+  if (!verify) {
     // Log an Express error for Depay request verification failed
     console.error("Depay request verification failed");
   }
 
-  return verified;
+  return verify;
 };
 
 const getDepayResponseSignature = (responseString) => {
