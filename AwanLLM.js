@@ -2,10 +2,12 @@ const dotenv = require("dotenv");
 
 dotenv.config();
 
+// AwanLLM class
 class AwanLLM {
+  // Constructor
   constructor(
     apiKey = process.env.AWANLLM_API_KEY,
-    model = "Awanllm-Llama-3-8B-Dolfin"
+    model = "Awanllm-Llama-3-8B-Dolfin",
   ) {
     this.apiKey = apiKey;
     this.model = model;
@@ -20,11 +22,13 @@ class AwanLLM {
     };
   }
 
+  // Set the role
   role(role) {
     this.currentRole = role;
     return this;
   }
 
+  // Add content
   content(content) {
     if (!this.currentRole) {
       throw new Error("Role must be set before content.");
@@ -34,6 +38,7 @@ class AwanLLM {
     return this;
   }
 
+  // Send the chat completions to the AwanLLM API
   async sendChatCompletions() {
     const fetch = (await import("node-fetch")).default;
     const url = "https://api.awanllm.com/v1/chat/completions";
@@ -58,21 +63,21 @@ class AwanLLM {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
 
+      // Parse the response
       const responseText = await response.text();
-
       const regex = /{"content":"(.*?)"/g;
       let match;
-
       let botResponses = [];
 
+      // Extract the bot responses from the response
       while ((match = regex.exec(responseText)) !== null) {
         botResponses.push(match[1]);
       }
-
       if (botResponses.length === 0) {
         throw new Error("No bot responses found in the response");
       }
 
+      // Join the bot responses
       if (botResponses) {
         botResponses = botResponses.join("");
 
@@ -90,4 +95,5 @@ class AwanLLM {
   }
 }
 
+// Export the AwanLLM class
 module.exports = AwanLLM;

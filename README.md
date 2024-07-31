@@ -10,7 +10,7 @@ Ensure Python and NodeJS are installed
 
 Download the Repo to your local deice
 
-Download all packages to your project directory using your preferred package manager (I use PNPM)
+Download all packages to your project directory using your preferred package manager (ex: _npm install_)
 
 Set up a Python virtual environment
 
@@ -22,7 +22,7 @@ Create a .env file and assign your API key to _AWANLLM_API_KEY_
 
 Obtain your own DePay Widget integration and credit card payment integration
 
-Generate using SSL a key pair for DePay
+Generate an SSL a key pair for DePay
 
 Add .env files and modify code to fit your personal details
 

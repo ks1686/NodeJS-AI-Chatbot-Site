@@ -13,7 +13,7 @@ const { exec } = require("child_process");
 const uuid = require("uuid");
 const axios = require("axios");
 /* Custom Depay module that doesn't seem to work
-const { verify } = require("@depay/js-verify-signature"); 
+const { verify } = require("@depay/js-verify-signature");
 */
 
 // Load environment variables
@@ -35,7 +35,7 @@ app.use(
     secret: crypto.randomBytes(64).toString("hex"),
     resave: false,
     saveUninitialized: true,
-  })
+  }),
 );
 
 // Middleware to clear cart if menu parameter changes
@@ -74,7 +74,7 @@ if (!fs.existsSync(audioDirectory)) {
   fs.mkdirSync(audioDirectory);
 }
 
-// Declare chatbot variables
+// Declare chatbot
 let chatbot;
 
 // All needed environment variables for Depay (keys from pem file)
@@ -94,18 +94,19 @@ const verifyDepayRequest = async (req) => {
   });
   */
 
+  // Verify request signature
   const verify = crypto.createVerify("RSA-SHA256");
   verify.update(JSON.stringify(data));
   verify.verify(public_key, req.headers["x-signature"], "base64");
 
   if (!verify) {
-    // Log an Express error for Depay request verification failed
     console.error("Depay request verification failed");
   }
 
   return verify;
 };
 
+// Function to get response signature for Depay
 const getDepayResponseSignature = (responseString) => {
   const signature = crypto.sign("sha256", Buffer.from(responseString), {
     key: privateKey,
@@ -113,6 +114,7 @@ const getDepayResponseSignature = (responseString) => {
     saltLength: 64,
   });
 
+  // Convert signature to URL-safe base64
   const urlSafeBase64Signature = signature
     .toString("base64")
     .replace(/\+/g, "-")
@@ -137,7 +139,7 @@ function loadMenuData(menuParam) {
       .filter((item) => item.in_stock)
       .map(
         (item) =>
-          `${item.item}: $${item.price.toFixed(2)} - ${item.description}`
+          `${item.item}: $${item.price.toFixed(2)} - ${item.description}`,
       )
       .join("\n");
   } catch (err) {
@@ -183,8 +185,10 @@ app.get("/category/:category_name", (req, res) => {
   const { menuData } = loadMenuData(menuParam);
   const category_name = req.params.category_name;
   const items_in_category = menuData.filter(
-    (item) => item.category === category_name && item.in_stock
+    (item) => item.category === category_name && item.in_stock,
   );
+
+  // Render the category_items template
   res.render("category_items.ejs", {
     category_name: category_name,
     items: items_in_category,
@@ -194,11 +198,11 @@ app.get("/category/:category_name", (req, res) => {
 
 // Route to view the cart, transaction total, and hide_cart_button
 app.get("/view_cart", (req, res) => {
+  // Generate a unique identifier for the transaction
   const menuParam = req.query.menu;
   const guid = uuid.v4();
 
-  console.log("GUID:", guid);
-
+  // Calculate the total price of the items in the cart
   let total = 0;
   if (req.session.cart) {
     req.session.cart.forEach((item) => {
@@ -206,6 +210,7 @@ app.get("/view_cart", (req, res) => {
     });
   }
 
+  // Render the view_cart template
   res.render("view_cart.ejs", {
     cart: req.session.cart,
     total: total.toFixed(2),
@@ -219,7 +224,6 @@ app.get("/view_cart", (req, res) => {
 //Route to add item to the cart
 app.post("/add_to_cart", (req, res) => {
   const { item_name, item_price, quantity } = req.body;
-
   if (!quantity || isNaN(quantity) || parseInt(quantity) < 1) {
     return res.status(400).send("Invalid quantity");
   }
@@ -247,6 +251,7 @@ app.post("/add_to_cart", (req, res) => {
     });
   }
 
+  // Save the session
   req.session.save((err) => {
     if (err) {
       console.error(err);
@@ -261,13 +266,12 @@ app.post("/add_to_cart", (req, res) => {
 // Route to remove items from the cart
 app.post("/remove_from_cart", (req, res) => {
   const { item_name } = req.body;
-
   if (!req.session.cart) {
     return res.status(400).send("Cart is empty");
   }
 
+  // Remove the item from the cart
   req.session.cart = req.session.cart.filter((item) => item.name !== item_name);
-
   req.session.save((err) => {
     if (err) {
       console.error(err);
@@ -282,21 +286,23 @@ app.post("/remove_from_cart", (req, res) => {
 // Route to update item quantity inside the cart
 app.post("/update_cart", (req, res) => {
   const { item_name, new_quantity } = req.body;
-
   if (!req.session.cart) {
     return res.status(400).send("Cart is empty");
   }
 
+  // Validate the new quantity
   if (!new_quantity || isNaN(new_quantity) || parseInt(new_quantity) < 1) {
     return res.status(400).send("Invalid quantity");
   }
 
+  // Update the quantity of the item in the cart
   req.session.cart.forEach((item) => {
     if (item.name === item_name) {
       item.quantity = parseInt(new_quantity);
     }
   });
 
+  // Save the session
   req.session.save((err) => {
     if (err) {
       console.error(err);
@@ -344,7 +350,7 @@ app.post("/tts", async (req, res) => {
         __dirname,
         "static",
         "audio",
-        "output.mp3"
+        "output.mp3",
       ); // Adjust the path as needed
       gttsObject.save(audioFilePath, async (err, result) => {
         if (err) {
@@ -381,7 +387,7 @@ app.post("/record", upload.single("audio"), (req, res) => {
       // Process the output text (located in /txt/recording.txt)
       const processedText = fs.readFileSync(
         path.join(__dirname, "txt", "recording.txt"),
-        "utf8"
+        "utf8",
       );
 
       // Delete the audio file
@@ -408,8 +414,8 @@ app.post("/process_payment", async (req, res) => {
   // Pull the GUID from the request body
   const guid = req.body.guid;
 
+  // Set the payment gateway URL
   const paymentGatewayUrl = process.env.PAYMENT_GATEWAY_URL;
-
   const paymentData = {
     Version: "1.0",
     MerchantId: process.env.MERCHANT_ID,
@@ -471,6 +477,7 @@ app.post("/depay/endpoint", async (req, res) => {
     return res.status(400).send("Unauthorized request");
   }
 
+  // Configuration for the payment
   const configuration = {
     amount: {
       currency: "USD",
@@ -480,19 +487,20 @@ app.post("/depay/endpoint", async (req, res) => {
       {
         blockchain: "ethereum",
         token: "0xdac17f958d2ee523a2206206994597c13d831ec7",
-        receiver: "0x4e260bB2b25EC6F3A59B478fCDe5eD5B8D783B02",
+        receiver: process.env.ETH_ADDRESS,
       },
       {
         blockchain: "ethereum",
         token: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
-        receiver: "0x4e260bB2b25EC6F3A59B478fCDe5eD5B8D783B02",
+        receiver: process.env.ETH_ADDRESS,
       },
     ],
   };
 
+  // Set the response header with the signature
   res.setHeader(
     "x-signature",
-    getDepayResponseSignature(JSON.stringify(configuration))
+    getDepayResponseSignature(JSON.stringify(configuration)),
   );
   res.status(200).json(configuration);
 });
@@ -504,10 +512,9 @@ app.post("/depay/events", async (req, res) => {
   }
 
   try {
+    // Get the transaction details from the request body
     const transaction = req.body;
     const payload = transaction.payload;
-
-    // Get the transaction details from the request body
     const total = payload.total;
     const guid = payload.guid;
     const blockchain = transaction.blockchain;
