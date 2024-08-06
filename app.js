@@ -6,7 +6,6 @@ const path = require("path");
 const fs = require("fs");
 const dotenv = require("dotenv");
 const crypto = require("crypto");
-const bodyParser = require("body-parser");
 const AwanLLM = require("./AwanLLM");
 const gtts = require("gtts");
 const { exec } = require("child_process");
@@ -28,8 +27,8 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "templates"));
 
 // Middleware
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 app.use(
   session({
     secret: crypto.randomBytes(64).toString("hex"),
